@@ -31,5 +31,6 @@ bin/console parser:send-parse-url
 
 # Слушатель сообщений с урлами на проверку
 bin/console messenger:consume -vv check_url
+bin/console messenger:consume parse_url_checked
 
 ###<<< Команды под супервизор

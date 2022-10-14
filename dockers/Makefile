@@ -33,6 +33,9 @@ watch:
 nodejs:
 	docker-compose exec frontend-nodejs
 
+telegram-get-messages:
+	docker-compose exec php-fpm bin/console telegram:get-messages
+
 
 
 
