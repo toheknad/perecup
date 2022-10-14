@@ -1,0 +1,137 @@
+version: '3'
+services:
+  nginx:
+    image: ${PROJECT_NAME}_nginx
+    container_name: ${PROJECT_NAME}_nginx
+    build:
+      context: ./backend
+      dockerfile: nginx.docker
+    restart: always
+    volumes:
+      - ../backend/:/app
+    depends_on:
+      - php-fpm
+    ports:
+      - '8080:80'
+    networks:
+      - main_network
+
+  php-fpm:
+    image: ${PROJECT_NAME}-php-fpm
+    container_name: ${PROJECT_NAME}_php-fpm
+    build:
+      context: ./backend
+      dockerfile: php-fpm.docker
+    volumes:
+      - ../backend/:/app
+    expose:
+      - 9000
+    environment:
+      PHP_IDE_CONFIG: serverName=${PROJECT_NAME}_Docker
+      TZ: "Europe/Moscow"
+    extra_hosts:
+      - main_host:${MAIN_HOST}
+    networks:
+      - main_network
+    depends_on:
+        - mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: ${PROJECT_NAME}_mysql
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./data/mysql/:/var/lib/mysql
+    restart: always
+    environment:
+      - "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}"
+      - "MYSQL_DATABASE=${MYSQL_DATABASE}"
+      - "MYSQL_USER=${MYSQL_USER}"
+      - "MYSQL_PASSWORD=${MYSQL_PASSWORD}"
+    networks:
+      - main_network
+
+  adminer:
+    image: adminer
+    container_name: ${PROJECT_NAME}_adminer
+    restart: always
+    ports:
+      - '8082:8080'
+    extra_hosts:
+      - main_host:${MAIN_HOST}
+    networks:
+      - main_network
+
+  frontend-nginx:
+    image: ${PROJECT_NAME}_frontend-nginx
+    container_name: ${PROJECT_NAME}_frontend-nginx
+    build:
+      context: ./spa
+      dockerfile: nginx.docker
+    restart: always
+    volumes:
+      - ../spa/:/app
+    ports:
+      - '8083:83'
+    networks:
+      - main_network
+
+  frontend-nodejs:
+    container_name: ${PROJECT_NAME}_frontend-nodejs
+    image: node:14.15.3-alpine
+    volumes:
+      - ../spa/:/app
+    working_dir: /app
+    tty: true
+    networks:
+      - main_network
+
+  rabbitmq:
+    image: ${PROJECT_NAME}_rabbitmq
+    container_name:  ${PROJECT_NAME}_rabbitmq
+    build:
+      context: ./rabbitmq
+      dockerfile: rabbitmq.docker
+    restart: always
+    ports:
+#      - '4369:4369'
+#      - '5551:5551'
+#      - '5552:5552'
+#      - '5672:5672'
+#      - '25672:25672'
+#      - '15671:15671'
+      - '15672:15672'
+    environment:
+      - RABBITMQ_SECURE_PASSWORD=${RABBITMQ_SECURE_PASSWORD}
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - ./data/rabbitmq/:/var/lib/rabbitmq
+    networks:
+      - main_network
+
+  parser-nodejs:
+    container_name: ${PROJECT_NAME}_parser-nodejs
+    build:
+      context: ./parser
+      dockerfile: nodejs.docker
+    volumes:
+      - ../parser/:/app
+    working_dir: /app
+    tty: true
+    networks:
+      - main_network
+
+networks:
+  main_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUB_NET}
+
+#volumes:
+#  realestate_mysql:
+#  rabbitmq_data:
+#    driver: local
+
