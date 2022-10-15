@@ -7,14 +7,14 @@ const UserAgent = require("user-agents");
 
 module.exports = async (url) => {
 
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    for (let i = 0; i < 5; i++) {
-        console.log(`Waiting ${i} seconds...`);
-        await sleep(i * 1000);
-    }
+    // function sleep(ms) {
+    //     return new Promise(resolve => setTimeout(resolve, ms));
+    // }
+    //
+    // for (let i = 0; i < 5; i++) {
+    //     console.log(`Waiting ${i} seconds...`);
+    //     await sleep(i * 1000);
+    // }
     console.log('Done');
     const baseUrl = url;
 
