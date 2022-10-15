@@ -44,6 +44,7 @@ class ParseUrlCheckedHandler
             return;
         }
 
+        /** @var TelegramUser $telegramUser */
         $telegramUser = $this->telegramUserRepository->find($message->userId);
         $urlChecked = new UrlChecked();
         $urlChecked->setUrl($message->url);
@@ -53,7 +54,7 @@ class ParseUrlCheckedHandler
         $this->entityManager->flush();
 
         MessageBuilder::sendMatchMessage(
-            588866042,
+            $telegramUser->getChatId(),
             $message->name,
             $message->price,
             $message->description,
