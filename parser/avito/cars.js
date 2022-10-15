@@ -54,8 +54,11 @@ module.exports = async (url) => {
     console.log('2323');
 
 
-    let data = await page.$$eval('div[itemtype="http://schema.org/Product"]', elements => {
+    let data = await page.$$eval('div[data-marker="catalog-serp"] div[itemtype="http://schema.org/Product"]', elements => {
         return elements.map(el => {
+            if (!el.parentElement.getAttribute('data-marker')) {
+                return {};
+            }
             let name = el.querySelector('a[data-marker="item-title"] h3').textContent;
             let url = el.querySelector('a[data-marker="item-title"]').getAttribute('href');
             let price = el.querySelector('meta[itemprop="price"]').getAttribute('content');
@@ -70,13 +73,16 @@ module.exports = async (url) => {
             };
         })
     });
-
-    for (let i = 0; i < data.length; i++) {
-        data[i].baseUrl = url;
+    console.log(data);
+    let filtered = data.filter(function(value, index, arr){
+        return value.name;
+    });
+    for (let i = 0; i < filtered.length; i++) {
+        filtered[i].baseUrl = url;
     }
 
-    console.log(data);
+    console.log(filtered);
     await browser.close();
     console.log('DONE!');
-    return data;
+    return filtered;
 };
