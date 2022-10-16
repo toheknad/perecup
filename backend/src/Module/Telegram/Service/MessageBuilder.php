@@ -175,6 +175,17 @@ class MessageBuilder
 
     public static function sendAllLinksUser(int $chatId, Collection $links)
     {
+        if (count($links->toArray()) === 0) {
+            $text = [];
+            $text[] = "<b><i>У вас нет ссылок</i></b>";
+            $text = implode(PHP_EOL, $text);
+            Request::sendMessage([
+                'chat_id' => $chatId,
+                'text' => $text,
+                'parse_mode' => 'HTML',
+            ]);
+        }
+
         foreach ($links->toArray() as $link) {
             $text = [];
             $text[] = "<b><i>Id:</i></b>: {$link->getId()}";
