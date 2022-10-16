@@ -43,9 +43,9 @@ class ParserSendParseUrlCommand extends Command
         $this->logger->info('Запущено!');
         $io = new SymfonyStyle($input, $output);
 
-        $lstParseUrl = $this->parseUrlRepository->getActiveNow();
 
         while(true) {
+            $lstParseUrl = $this->parseUrlRepository->getActiveNow();
             $dt = (new DateTime())->format('Y-m-d H:i:s');
             echo $dt . " - START". PHP_EOL;
             sleep(50);
