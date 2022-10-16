@@ -38,6 +38,7 @@ class MessageHandleService
             }
             $this->user = $this->getUserByChatId($telegramUserId);
         }
+        print_r(count($this->user->getParseUrls()->toArray()));
         $this->handleMessageByType($message);
 
     }
@@ -115,6 +116,7 @@ class MessageHandleService
 
                 $this->entityManager->persist($parseUrl);
                 $this->entityManager->flush();
+                $this->entityManager->clear();
                 MessageBuilder::sendMessageAfterAddingLink($message['message']['from']['id']);
 
         }
