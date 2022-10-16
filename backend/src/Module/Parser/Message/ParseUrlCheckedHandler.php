@@ -58,7 +58,8 @@ class ParseUrlCheckedHandler
             $message->name,
             $message->price,
             $message->description,
-            $message->url
+            $message->url,
+            $message->baseUrl,
         );
 
         echo $dt. '- Message send to 588866042' . PHP_EOL;

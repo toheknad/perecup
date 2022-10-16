@@ -59,6 +59,7 @@ module.exports = async (url) => {
             if (!el.parentElement.getAttribute('data-marker')) {
                 return {};
             }
+            // return el.children[0].getAttribute('class');
             let name = el.querySelector('a[data-marker="item-title"] h3').textContent;
             let url = el.querySelector('a[data-marker="item-title"]').getAttribute('href');
             let price = el.querySelector('meta[itemprop="price"]').getAttribute('content');
@@ -73,7 +74,8 @@ module.exports = async (url) => {
             };
         })
     });
-    console.log(data);
+    // console.log(data);
+    // return data;
     let filtered = data.filter(function(value, index, arr){
         return value.name;
     });

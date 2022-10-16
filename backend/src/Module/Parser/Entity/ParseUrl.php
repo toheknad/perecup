@@ -5,6 +5,7 @@ namespace App\Module\Parser\Entity;
 use App\Module\Parser\Repository\ParseUrlRepository;
 use App\Module\Telegram\Entity\TelegramUser;
 use App\Module\UrlChecked\Entity\UrlChecked;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ParseUrlRepository::class)]
@@ -30,6 +31,9 @@ class ParseUrl
     #[ORM\ManyToOne(targetEntity: TelegramUser::class, inversedBy: 'parseUrls')]
     #[ORM\JoinColumn(name: 'telegram_user_id', referencedColumnName: 'id')]
     private TelegramUser $user;
+
+    #[ORM\OneToMany(mappedBy: "parseUrl", targetEntity: UrlChecked::class, cascade: ["persist", "remove"])]
+    private Collection $urlChecked;
 
     public function getId(): ?int
     {

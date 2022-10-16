@@ -114,7 +114,7 @@ class MessageBuilder
         ]);
     }
 
-    public static function sendMatchMessage(int $chatId, string $name, int $price, string $description, string $url)
+    public static function sendMatchMessage(int $chatId, string $name, int $price, string $description, string $url, string $baseUrl)
     {
         $url = 'https://www.avito.ru'.$url;
         $text = [];
@@ -124,6 +124,7 @@ class MessageBuilder
         $text[] = "<b><i>Цена</i></b>: {$price}";
         $text[] = "<b><i>Описание</i></b>: {$description}";
         $text[] = "<b><i>Сссылка:</i></b>: {$url}";
+        $text[] = "<b><i>Фильтр:</i></b>: {$baseUrl}";
         $text = implode(PHP_EOL, $text);
 
 
@@ -203,6 +204,20 @@ class MessageBuilder
                 'reply_markup' => $keyboards,
             ]);
         }
+    }
+
+    public static function sendMessageLinkDelete(int $chatId)
+    {
+        $text = [];
+        $text[] = "<b>Ссылка успешно удалена</b>";
+        $text = implode(PHP_EOL, $text);
+
+
+        Request::sendMessage([
+            'chat_id' => $chatId,
+            'text'    => $text,
+            'parse_mode' => 'HTML',
+        ]);
     }
 
 }
