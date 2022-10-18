@@ -19,11 +19,14 @@ module.exports = async (url) => {
         console.log('Done');
         const baseUrl = url;
 
+        console.log('TEST1');
         const UserAgent = require("user-agents");
+        console.log('TEST2');
         const userAgent = new UserAgent({
             deviceCategory: "desktop",
             platform: "Linux x86_64",
         });
+        console.log('TEST3');
         const browser = await puppeteer.launch({
             headless: true,
             args: [
@@ -35,8 +38,9 @@ module.exports = async (url) => {
                 "--user-agent=" + userAgent + ""
             ]
         });
-
+        console.log('TEST4');
         const page = await browser.newPage();
+        console.log('TEST5');
         console.log(""+userAgent);
         console.log(baseUrl);
         await page.setRequestInterception(true);
