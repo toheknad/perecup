@@ -48,7 +48,19 @@ module.exports = async (url, proxy) => {
     });
     await page.goto(baseUrl);
 
-    await page.$eval('div[elementtiming="bx.gallery.first-item"]', el => el.remove());
+    const selector1 = ".avito-ads-container_context_15";
+    const selector2 = ".avito-ads-container_context_1";
+    const selector3 = ".avito-ads-container_context_7";
+
+    await page.evaluate(`
+      document.querySelector("${selector1}").remove()
+    `);
+    await page.evaluate(`
+      document.querySelector("${selector2}").remove()
+    `);
+    await page.evaluate(`
+      document.querySelector("${selector3}").remove()
+    `);
 
     // пример передачи переменой в анонимную функцию
     // await page.evaluate((sel) => {
