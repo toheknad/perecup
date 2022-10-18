@@ -23,7 +23,7 @@ amqp.connect(config.rabbitMQUrl, (err, conn) => {
     console.log('TEST123123')
     conn.createChannel((error, ch) => {
         if (error) {
-            process.exit(1);
+            console.log('TEST')
         }
         ch.assertQueue(config.urlQueueParse, { durable: true });
         ch.prefetch(1);
