@@ -27,6 +27,7 @@ module.exports = async (url) => {
             platform: "Linux x86_64",
         });
         console.log('TEST3');
+        console.log(""+userAgent);
         const browser = await puppeteer.launch({
             headless: true,
             args: [
