@@ -50,7 +50,7 @@ class TelegramGetMessagesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         while(true) {
-            sleep(1);
+//            sleep(1);
             $messages = $this->telegram->handleGetUpdates()->getRawData();
             foreach ($messages['result'] as $message) {
                 $this->messageHandleService->start($message);

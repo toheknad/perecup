@@ -10,24 +10,24 @@ use JetBrains\PhpStorm\Pure;
  */
 class ParseUrlMessage
 {
-    /** @var string|null Прокси сервер */
-    public ?string $proxy;
 
     public function __construct(
         public string  $source,              // Источник/сайт для парсинга
         public string  $url,                 // URL адрес страницы для парсинга
-        public int  $userId                  // URL адрес страницы для парсинга
+        public int  $userId,                 // URL адрес страницы для парсинга
+        public string  $proxy                  // URL адрес страницы для парсинга
     )
     {
     }
 
     #[Pure]
-    public static function createFromEntity(ParseUrl $item): ParseUrlMessage
+    public static function createFromEntity(ParseUrl $item, string $proxy): ParseUrlMessage
     {
         return new self(
             $item->getSource(),
             $item->getUrl(),
-            $item->getUser()->getId()
+            $item->getUser()->getId(),
+            $proxy
         );
     }
 }

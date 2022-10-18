@@ -43,7 +43,6 @@ class ParseUrlCheckedHandler
             echo $dt.' - Url is not found' . PHP_EOL;
             return;
         }
-
         /** @var TelegramUser $telegramUser */
         $telegramUser = $this->telegramUserRepository->find($message->userId);
         $urlChecked = new UrlChecked();
@@ -52,16 +51,16 @@ class ParseUrlCheckedHandler
         $urlChecked->setUser($telegramUser);
         $this->entityManager->persist($urlChecked);
         $this->entityManager->flush();
-
-        MessageBuilder::sendMatchMessage(
-            $telegramUser->getChatId(),
-            $message->name,
-            $message->price,
-            $message->description,
-            $message->url,
-            $message->baseUrl,
-        );
-
+        if ($this->urlCheckedRepository->count(['parseUrl' => $parseUrl]) > 50){
+             MessageBuilder::sendMatchMessage(
+                 $telegramUser->getChatId(),
+                 $message->name,
+                 $message->price,
+                 $message->description,
+                 $message->url,
+                 $message->baseUrl,
+             );
+        }
         echo $dt. '- Message send to 588866042' . PHP_EOL;
 
     }

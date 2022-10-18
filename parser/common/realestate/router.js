@@ -20,7 +20,6 @@ amqp.connect(config.rabbitMQUrl, (err, conn) => {
     if (err) {
         console.log(`Er22ror ${err}`);
     }
-    console.log('TEST123123')
     conn.createChannel((error, ch) => {
         if (error) {
             console.log('TEST')
@@ -34,8 +33,8 @@ amqp.connect(config.rabbitMQUrl, (err, conn) => {
 
                 let fullUrl = task.url;
 
-                console.log(fullUrl);
-                result = await cars(fullUrl);
+                // console.log(fullUrl);
+                result = await cars(fullUrl, task.proxy);
             }
 
             for (let i = 0; i < result.length; i++) {
