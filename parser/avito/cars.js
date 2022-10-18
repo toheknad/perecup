@@ -7,6 +7,7 @@ const UserAgent = require("user-agents");
 
 module.exports = async (url) => {
     try {
+        console.log('START');
         // function sleep(ms) {
         //     return new Promise(resolve => setTimeout(resolve, ms));
         // }
@@ -88,6 +89,8 @@ module.exports = async (url) => {
         console.log('DONE!');
         return filtered;
     } catch (error) {
+        console.log('ERROR');
+        console.log(error.toString());
         console.error(error);
         // expected output: ReferenceError: nonExistentFunction is not defined
         // Note - error messages will vary depending on browser
