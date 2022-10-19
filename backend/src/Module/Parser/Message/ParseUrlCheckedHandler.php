@@ -51,7 +51,7 @@ class ParseUrlCheckedHandler
         $urlChecked->setUser($telegramUser);
         $this->entityManager->persist($urlChecked);
         $this->entityManager->flush();
-        if ($this->urlCheckedRepository->count(['parseUrl' => $parseUrl]) > 50){
+//        if ($this->urlCheckedRepository->count(['parseUrl' => $parseUrl]) > 50){
              MessageBuilder::sendMatchMessage(
                  $telegramUser->getChatId(),
                  $message->name,
@@ -60,7 +60,7 @@ class ParseUrlCheckedHandler
                  $message->url,
                  $message->baseUrl,
              );
-        }
+//        }
         echo $dt. '- Message send to 588866042' . PHP_EOL;
 
     }
