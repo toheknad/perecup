@@ -45,14 +45,14 @@ class ParserSendParseUrlCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         while(true) {
-            $proxy = $this->proxyRepository->getNextProxy();
+//            $proxy = $this->proxyRepository->getNextProxy();
             $lstParseUrl = $this->parseUrlRepository->getActiveNow();
             $dt = (new DateTime())->format('Y-m-d H:i:s');
             echo $dt . " - START". PHP_EOL;
             sleep(50);
             foreach ($lstParseUrl as $item) {
                 echo $dt . " - LINK ADD". PHP_EOL;
-                $parseUrlMessage = ParseUrlMessage::createFromEntity($item, $proxy->getProxy());
+                $parseUrlMessage = ParseUrlMessage::createFromEntity($item, '2323:323');
                 $en = $this->messageBus->dispatch($parseUrlMessage);
                 $this->logger->debug('Отправлено в очередь!', [$en]);
             }
