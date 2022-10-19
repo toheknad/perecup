@@ -6,6 +6,7 @@ use App\Module\Parser\Message\ParseUrlCheckedMessage;
 use App\Module\Parser\Message\ParseUrlMessage;
 use App\Module\Parser\Repository\ParseUrlRepository;
 use App\Module\Proxy\Repository\ProxyRepository;
+use App\Module\UrlChecked\Repository\UrlCheckedRepository;
 use DateTime;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -28,6 +29,7 @@ class ParserSendParseUrlCommand extends Command
         private MessageBusInterface $messageBus,
         private LoggerInterface     $logger,
         private ProxyRepository     $proxyRepository,
+        private UrlCheckedRepository $urlCheckedRepository,
         string                      $name = null
     )
     {
@@ -49,10 +51,14 @@ class ParserSendParseUrlCommand extends Command
             $lstParseUrl = $this->parseUrlRepository->getActiveNow();
             $dt = (new DateTime())->format('Y-m-d H:i:s');
             echo $dt . " - START". PHP_EOL;
-            sleep(50);
+//            sleep(50);
             foreach ($lstParseUrl as $item) {
                 echo $dt . " - LINK ADD". PHP_EOL;
-                $parseUrlMessage = ParseUrlMessage::createFromEntity($item, '2323:323');
+                if ($this->urlCheckedRepository->count(['parseUrl' => $item]) === 0) {
+                    $parseUrlMessage = ParseUrlMessage::createFromEntity($item, '2323:323', true);
+                } else {
+                    $parseUrlMessage = ParseUrlMessage::createFromEntity($item, '2323:323', false);
+                }
                 $en = $this->messageBus->dispatch($parseUrlMessage);
                 $this->logger->debug('Отправлено в очередь!', [$en]);
             }

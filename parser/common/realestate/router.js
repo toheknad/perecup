@@ -36,14 +36,20 @@ amqp.connect(config.rabbitMQUrl, (err, conn) => {
                 // console.log(fullUrl);
                 result = await cars(fullUrl, task.proxy);
             }
-
+            let isFirstCheck;
+            if (task.isFirstCheck === true) {
+                isFirstCheck = true;
+            } else {
+                isFirstCheck = false;
+            }
             for (let i = 0; i < result.length; i++) {
                 // let e = {test:'123123'};
                 // let opts = { headers: { 'type': 'json'}};
                 ch.sendToQueue(config.urlQueueParseChecked, Buffer.from(JSON.stringify(result[i])), {
                     headers:{
                         content_type:	'application/json',
-                        idUser: task.userId
+                        idUser: task.userId,
+                        isFirstCheck: isFirstCheck
                     },
                     timestamp:	1665161929
                 });

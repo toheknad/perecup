@@ -22,7 +22,16 @@ class ParseUrlCheckedSerializer implements SerializerInterface
 
         // in case of redelivery, unserialize any stamps
         $stamps = [];
-        $envelope = new Envelope(new ParseUrlCheckedMessage($data['name'], (int)$data['price'], $data['description'], $data['time'], $data['url'], $data['baseUrl'], $headers['idUser']));
+        $envelope = new Envelope(new ParseUrlCheckedMessage(
+            $data['name'],
+            (int)$data['price'],
+            $data['description'],
+            $data['time'],
+            $data['url'],
+            $data['baseUrl'],
+            $headers['idUser'],
+            (bool)$headers['isFirstCheck'],
+        ));
         $envelope = $envelope->with(... $stamps);
 
         return $envelope;
