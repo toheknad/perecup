@@ -51,7 +51,7 @@ class ParserSendParseUrlCommand extends Command
             $lstParseUrl = $this->parseUrlRepository->getActiveNow();
             $dt = (new DateTime())->format('Y-m-d H:i:s');
             echo $dt . " - START". PHP_EOL;
-//            sleep(50);
+            sleep(60);
             foreach ($lstParseUrl as $item) {
                 echo $dt . " - LINK ADD". PHP_EOL;
                 if ($this->urlCheckedRepository->count(['parseUrl' => $item]) === 0) {
