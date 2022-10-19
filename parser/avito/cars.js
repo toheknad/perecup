@@ -4,9 +4,9 @@ const fs = require('fs');
 const randomUseragent = require('random-useragent');
 const UserAgent = require("user-agents");
 
-
 module.exports = async (url, proxy) => {
 
+    // Return anonymized version of original URL - looks like http://127.0.0.1:16383
     // function sleep(ms) {
     //     return new Promise(resolve => setTimeout(resolve, ms));
     // }
@@ -16,6 +16,7 @@ module.exports = async (url, proxy) => {
     //     await sleep(i * 1000);
     // }
     const baseUrl = url;
+    // const baseUrl = 'https://2ip.ru/';
 
     const UserAgent = require("user-agents");
     const userAgent = new UserAgent({
@@ -29,12 +30,20 @@ module.exports = async (url, proxy) => {
             "--disable-dev-shm-usage",
             "--disable-setuid-sandbox",
             "--no-sandbox",
-            // '--proxy-server='+proxy,
+            // `--proxy-server=socks5://bpro2xy.site:11429`,
+            // `--proxy-server=http://mproxy.site:11429`,
             "--user-agent=" + userAgent + ""
         ]
     });
 
+    const username = 'ldXwkC';
+    const password = '9iQhKzAatkQt';
     const page = await browser.newPage();
+    // await page.authenticate({
+    //     username: username,
+    //     password: password,
+    // });
+
     // console.log(""+userAgent);
     console.log(proxy);
     // console.log(baseUrl);
@@ -53,25 +62,26 @@ module.exports = async (url, proxy) => {
     const selector3 = ".avito-ads-container_context_7";
 
     await page.evaluate(`
-      document.querySelector("${selector1}").remove()
+      let sel = document.querySelector("${selector1}"); 
+      if (sel) {
+        sel.remove()
+      }
     `);
     await page.evaluate(`
-      document.querySelector("${selector2}").remove()
+      let sel1 = document.querySelector("${selector2}"); 
+      if (sel1) {
+        sel1.remove()
+      }
     `);
     await page.evaluate(`
-      document.querySelector("${selector3}").remove()
+      let sel2 = document.querySelector("${selector3}"); 
+      if (sel2) {
+        sel2.remove()
+      }
     `);
-
-    // пример передачи переменой в анонимную функцию
-    // await page.evaluate((sel) => {
-    //     var elements = document.querySelectorAll(sel);
-    //     for(var i=0; i< elements.length; i++){
-    //         elements[i].parentNode.removeChild(elements[i]);
-    //     }
-    // }, div_selector_to_remove)
     // await page.screenshot({path: 'buddy-screenshot.png',  fullPage: true });
     // await page.waitForSelector('span[data-marker="pagination-button/next"]');
-    //количество страниц
+    //количество страниц≠
 
     let data = await page.$$eval('div[data-marker="catalog-serp"] div[itemtype="http://schema.org/Product"]', elements => {
         return elements.map(el => {
