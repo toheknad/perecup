@@ -12,58 +12,6 @@ use Longman\TelegramBot\Request;
 
 class MessageBuilder
 {
-    public static function sendResultBySearchToUser(User $userBySearch, int $chatId)
-    {
-        $text = [];
-        $text[] = "<b>{$userBySearch->getName()} {$userBySearch->getSurname()}</b>";
-        $text[] = "<b><i>Возраст</i></b>: {$userBySearch->getAge()}";
-        $text[] = "<b><i>Пол</i></b>: {$userBySearch->getGender()}";
-        $text[] = "<b><i>Город</i></b>: {$userBySearch->getCity()}";
-        $text[] = "<b><i>Описание</i></b>: {$userBySearch->getAbout()}";
-        $text = implode(PHP_EOL, $text);
-
-        Request::sendPhoto([
-            'chat_id' => $chatId,
-            'photo'  => $userBySearch->getPhoto()
-        ]);
-
-        $likeButton = [];
-        $likeButton['text'] = '👎';
-        $likeButton['callback_data'] = json_encode(['type' => 'search', 'action' => 'dislike', 'userId' => $userBySearch->getId()]);
-
-        $dislikeButton = [];
-        $dislikeButton['text'] = '👍️';
-        $dislikeButton['callback_data'] = json_encode(['type' => 'search', 'action' => 'like', 'userId' => $userBySearch->getId()]);
-
-        $keyboards = new InlineKeyboard(
-            [
-                $likeButton,
-                $dislikeButton
-            ],
-        );
-
-        Request::sendMessage([
-            'chat_id' => $chatId,
-            'text'    => $text,
-            'parse_mode' => 'HTML',
-            'reply_markup' =>  $keyboards,
-        ]);
-    }
-
-    public static function sendNotFoundBySearch(int $chatId)
-    {
-        $text = [];
-        $text[] = "<b>К сожалению не удалось найти новых анкет</b>";
-        $text = implode(PHP_EOL, $text);
-
-
-        Request::sendMessage([
-            'chat_id' => $chatId,
-            'text'    => $text,
-            'parse_mode' => 'HTML',
-        ]);
-    }
-
 
     public static function sendWelcomeMessage(int $chatId)
     {
@@ -114,18 +62,27 @@ class MessageBuilder
         ]);
     }
 
-    public static function sendMatchMessage(int $chatId, string $name, int $price, string $description, string $url, string $baseUrl, ?string $filterName)
+    public static function sendMatchMessage(
+        int $chatId,
+        string $name,
+        int $price,
+        string $description,
+        string $url,
+        string $baseUrl,
+        ?string $filterName,
+        string $city
+    )
     {
         $url = 'https://www.avito.ru'.$url;
         $text = [];
         $text[] = "<b>🚨Новое объявление🚨</b>";
-        $text[] = "<b></b>";
-        $text[] = "<b><i>Имя</i></b>: {$name}";
-        $text[] = "<b><i>Цена</i></b>: {$price}";
-        $text[] = "<b><i>Описание</i></b>: {$description}";
-//        $text[] = "<b><i>Сссылка</i></b>: {$url}";
+        $text[] = "";
+        $text[] = "🚗<b>Имя</b>: {$name}";
+        $text[] = "💰<b>Цена</b>: {$price}";
+        $text[] = "📖<b>Описание</b>: {$description}";
+        $text[] = "🌆<b>Город</b>: {$city}";
         if ($filterName) {
-            $text[] = "<b><i>Имя фильтра</i></b>: {$filterName}";
+            $text[] = "📁<b>Имя фильтра</b>: {$filterName}";
         }
         $text = implode(PHP_EOL, $text);
 
@@ -223,7 +180,7 @@ class MessageBuilder
     {
         if (count($links->toArray()) === 0) {
             $text = [];
-            $text[] = "<b><i>У вас нет ссылок</i></b>";
+            $text[] = "<b>У вас нет ссылок</b>";
             $text = implode(PHP_EOL, $text);
             Request::sendMessage([
                 'chat_id' => $chatId,
@@ -235,24 +192,23 @@ class MessageBuilder
         /** @var ParseUrl $link */
         foreach ($links->toArray() as $link) {
             $text = [];
-            $text[] = "<b><i>Id</i></b>: {$link->getId()}";
-            $text[] = "<b><i>Источник</i></b>: {$link->getSource()}";
-            $text[] = "<b><i>Имя фильтра</i></b>: {$link->getName()}";
-            $text[] = "<b><i>Ссылка</i></b>: {$link->getUrl()}";
+            $text[] = "<b>Id</b>: {$link->getId()}";
+            $text[] = "<b>Источник</b>: {$link->getSource()}";
+            $text[] = "<b>Имя фильтра</b>: {$link->getName()}";
             $text = implode(PHP_EOL, $text);
 
-            $likeButton = [];
-            $likeButton['text'] = 'Удалить';
-            $likeButton['callback_data'] = json_encode(['type' => 'link', 'action' => 'delete', 'linkId' => $link->getId()]);
+            $deleteButton = [];
+            $deleteButton['text'] = 'Удалить ❌';
+            $deleteButton['callback_data'] = json_encode(['type' => 'link', 'action' => 'delete', 'linkId' => $link->getId()]);
 
-//            $dislikeButton = [];
-//            $dislikeButton['text'] = '👍️';
-//            $dislikeButton['callback_data'] = json_encode(['type' => 'search', 'action' => 'like', 'userId' => $userBySearch->getId()]);
+            $linkButton = [];
+            $linkButton['text'] = 'Ссылка на фильтр 🛠';
+            $linkButton['url'] = $link->getUrl();
 
             $keyboards = new InlineKeyboard(
                 [
-                    $likeButton,
-//                    $dislikeButton
+                    $deleteButton,
+                    $linkButton
                 ],
             );
 

@@ -31,6 +31,7 @@ class ParseUrlCheckedSerializer implements SerializerInterface
             $data['baseUrl'],
             $headers['idUser'],
             (bool)$headers['isFirstCheck'],
+            $data['city']
         ));
         $envelope = $envelope->with(... $stamps);
 

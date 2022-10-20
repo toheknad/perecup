@@ -61,6 +61,7 @@ class ParseUrlCheckedHandler
                  $message->url,
                  $message->baseUrl,
                  $parseUrl->getName(),
+                 $message->city
              );
         }
         echo $dt. '- Message send to 588866042' . PHP_EOL;

@@ -81,12 +81,14 @@ module.exports = async (url, proxy) => {
             let price = el.querySelector('meta[itemprop="price"]').getAttribute('content');
             let description = el.querySelector('div[data-marker="item-specific-params"]').textContent;
             let time = el.querySelector('div[data-marker="item-date"]').textContent;
+            let city = el.querySelector('div[class*="geo-georeferences"] span span').textContent;
             return {
                 name,
                 price,
                 description,
                 time,
-                url
+                url,
+                city
             };
         })
     });

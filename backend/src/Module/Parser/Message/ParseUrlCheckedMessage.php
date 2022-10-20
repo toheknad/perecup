@@ -19,6 +19,7 @@ class ParseUrlCheckedMessage
         public string $baseUrl,
         public int $userId,
         public bool $isFirstCheck,
+        public string $city,
     )
     {
     }
