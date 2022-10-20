@@ -57,7 +57,7 @@ module.exports = async (url, proxy) => {
     // console.log(baseUrl);
     await page.setRequestInterception(true);
     page.on('request', (request) => {
-        if (['image', 'font', 'stylesheet'].indexOf(request.resourceType()) !== -1) {
+        if (['image', 'font', 'stylesheet', 'script'].indexOf(request.resourceType()) !== -1) {
             request.abort();
         } else {
             request.continue();
@@ -74,7 +74,7 @@ module.exports = async (url, proxy) => {
         }
       }
     `);
-    await page.screenshot({path: 'buddy-screenshot.png',  fullPage: true });
+    // await page.screenshot({path: 'buddy-screenshot.png',  fullPage: true });
     // await page.waitForSelector('span[data-marker="pagination-button/next"]');
     //количество страниц≠
 
