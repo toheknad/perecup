@@ -1,28 +1,33 @@
 const rp        = require('request-promise');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
+// const puppeteer = require('puppeteer');
 const fs = require('fs');
 const randomUseragent = require('random-useragent');
 const UserAgent = require("user-agents");
 
+const StealthPlugin = require('puppeteer-extra-plugin-stealth')
+puppeteer.use(StealthPlugin())
+
+
 module.exports = async (url, proxy) => {
 
     // Return anonymized version of original URL - looks like http://127.0.0.1:16383
-    // function sleep(ms) {
-    //     return new Promise(resolve => setTimeout(resolve, ms));
-    // }
-    //
-    // for (let i = 0; i < 5; i++) {
-    //     console.log(`Waiting ${i} seconds...`);
-    //     await sleep(i * 1000);
-    // }
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    for (let i = 0; i < 2; i++) {
+        console.log(`Waiting ${i} seconds...`);
+        await sleep(i * 1000);
+    }
     const baseUrl = url;
     // const baseUrl = 'https://2ip.ru/';
+    // const baseUrl = 'https://arh.antoinevastel.com/bots/areyouheadless';
+    // const baseUrl = 'https://bot.sannysoft.com';;
 
-    const UserAgent = require("user-agents");
-    const userAgent = new UserAgent({
-        deviceCategory: "desktop",
-        platform: "Linux x86_64",
-    });
+
+    const userAgent = new UserAgent({ platform: 'Win32' });
+    let httpProxy = 'http://'+proxy;
     const browser = await puppeteer.launch({
         headless: true,
         args: [
@@ -30,26 +35,29 @@ module.exports = async (url, proxy) => {
             "--disable-dev-shm-usage",
             "--disable-setuid-sandbox",
             "--no-sandbox",
-            // `--proxy-server=socks5://bpro2xy.site:11429`,
-            // `--proxy-server=http://mproxy.site:11429`,
-            "--user-agent=" + userAgent + ""
+            // "--user-agent=" + userAgent + "",
+            // "--proxy-server=socks4://176.123.56.58:3629",
+            // "--proxy-server="+httpProxy,
+            // "--proxy-server=http://209.166.175.201:3128",
+            // '--proxy-server=socks5://127.0.0.1:9050'
         ]
     });
 
     const username = 'ldXwkC';
     const password = '9iQhKzAatkQt';
     const page = await browser.newPage();
+
     // await page.authenticate({
     //     username: username,
     //     password: password,
     // });
 
-    // console.log(""+userAgent);
+    console.log(""+userAgent);
     console.log(proxy);
     // console.log(baseUrl);
     await page.setRequestInterception(true);
     page.on('request', (request) => {
-        if (['image', 'stylesheet', 'font', 'script'].indexOf(request.resourceType()) !== -1) {
+        if (['image', 'font', 'stylesheet'].indexOf(request.resourceType()) !== -1) {
             request.abort();
         } else {
             request.continue();
@@ -66,7 +74,7 @@ module.exports = async (url, proxy) => {
         }
       }
     `);
-    // await page.screenshot({path: 'buddy-screenshot.png',  fullPage: true });
+    await page.screenshot({path: 'buddy-screenshot.png',  fullPage: true });
     // await page.waitForSelector('span[data-marker="pagination-button/next"]');
     //количество страниц≠
 
