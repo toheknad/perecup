@@ -114,24 +114,43 @@ class MessageBuilder
         ]);
     }
 
-    public static function sendMatchMessage(int $chatId, string $name, int $price, string $description, string $url, string $baseUrl)
+    public static function sendMatchMessage(int $chatId, string $name, int $price, string $description, string $url, string $baseUrl, ?string $filterName)
     {
         $url = 'https://www.avito.ru'.$url;
         $text = [];
-        $text[] = "<b>Ванечек, новый улов</b>";
+        $text[] = "<b>🚨Новое объявление🚨</b>";
         $text[] = "<b></b>";
         $text[] = "<b><i>Имя</i></b>: {$name}";
         $text[] = "<b><i>Цена</i></b>: {$price}";
         $text[] = "<b><i>Описание</i></b>: {$description}";
-        $text[] = "<b><i>Сссылка:</i></b>: {$url}";
-        $text[] = "<b><i>Фильтр:</i></b>: {$baseUrl}";
+//        $text[] = "<b><i>Сссылка</i></b>: {$url}";
+        if ($filterName) {
+            $text[] = "<b><i>Имя фильтра</i></b>: {$filterName}";
+        }
         $text = implode(PHP_EOL, $text);
+
+        $ad = [];
+        $ad['text'] = 'Объявление 🚘';
+        $ad['url'] = $url;
+
+        $filter = [];
+        $filter['text'] = 'Фильтр 🛠';
+        $filter['url'] = $baseUrl;
+
+
+        $keyboards = new InlineKeyboard(
+            [
+                $ad,
+                $filter
+            ],
+        );
 
 
         Request::sendMessage([
             'chat_id' => $chatId,
             'text'    => $text,
             'parse_mode' => 'HTML',
+            'reply_markup' => $keyboards,
         ]);
     }
 
@@ -154,7 +173,34 @@ class MessageBuilder
     public static function sendMessageAfterAddingLink(int $chatId)
     {
         $text = [];
+        $text[] = "<b>Теперь укажите имя для фильтра, чтобы его проще было найти среди других</b>";
+        $text = implode(PHP_EOL, $text);
+
+
+        Request::sendMessage([
+            'chat_id' => $chatId,
+            'text'    => $text,
+            'parse_mode' => 'HTML',
+        ]);
+    }
+
+    public static function sendMessageAfterSavingLink(int $chatId)
+    {
+        $text = [];
         $text[] = "<b>Фильтр успешно добавлен</b>";
+        $text = implode(PHP_EOL, $text);
+
+
+        Request::sendMessage([
+            'chat_id' => $chatId,
+            'text'    => $text,
+            'parse_mode' => 'HTML',
+        ]);
+    }
+    public static function sendMessageError(int $chatId)
+    {
+        $text = [];
+        $text[] = "<b>Что-то пошло не так</b>";
         $text = implode(PHP_EOL, $text);
 
 
@@ -186,10 +232,12 @@ class MessageBuilder
             ]);
         }
 
+        /** @var ParseUrl $link */
         foreach ($links->toArray() as $link) {
             $text = [];
-            $text[] = "<b><i>Id:</i></b>: {$link->getId()}";
+            $text[] = "<b><i>Id</i></b>: {$link->getId()}";
             $text[] = "<b><i>Источник</i></b>: {$link->getSource()}";
+            $text[] = "<b><i>Имя фильтра</i></b>: {$link->getName()}";
             $text[] = "<b><i>Ссылка</i></b>: {$link->getUrl()}";
             $text = implode(PHP_EOL, $text);
 

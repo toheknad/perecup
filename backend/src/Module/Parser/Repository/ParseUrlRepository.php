@@ -65,4 +65,5 @@ class ParseUrlRepository extends ServiceEntityRepository
         }
         return $res;
     }
+
 }

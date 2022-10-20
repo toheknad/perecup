@@ -110,15 +110,28 @@ class MessageHandleService
                 $parseUrl->setUrl($message['message']['text']);
                 $parseUrl->setPeriod(1);
                 $parseUrl->setSource('avito');
+                $parseUrl->setIsActive(false);
                 $parseUrl->setUser($this->user);
 
-                $this->user->setAction(0);
+                $this->user->setAction(ActionList::ADDING_LINK_NAME);
 
                 $this->entityManager->persist($parseUrl);
                 $this->entityManager->flush();
                 $this->entityManager->clear();
                 MessageBuilder::sendMessageAfterAddingLink($message['message']['from']['id']);
 
+        } elseif ($this->user->getAction() === ActionList::ADDING_LINK_NAME) {
+            if ($parseUrl = $this->parseUrlRepository->findOneBy(['user' => $this->user->getId()], ['id' => 'DESC'])) {
+                $parseUrl->setName($message['message']['text']);
+                $parseUrl->setIsActive(true);
+                $this->user->setAction(0);
+                $this->entityManager->flush();
+                $this->entityManager->clear();
+                MessageBuilder::sendMessageAfterSavingLink($message['message']['from']['id']);
+            } else {
+                $this->user->setAction(0);
+                MessageBuilder::sendMessageError($message['message']['from']['id']);
+            }
         }
     }
 

@@ -22,6 +22,9 @@ class ParseUrl
     #[ORM\Column(type: 'text')]
     private string $url;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $name = null;
+
     #[ORM\Column(type: 'integer')]
     private int $period;
 
@@ -103,6 +106,24 @@ class ParseUrl
     public function getUser(): TelegramUser
     {
         return $this->user;
+    }
+
+    /**
+     * @param string $name
+     * @return ParseUrl
+     */
+    public function setName(string $name): ParseUrl
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
     }
 
 }
