@@ -16,7 +16,7 @@ module.exports = async (url, proxy) => {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
         console.log(`Waiting ${i} seconds...`);
         await sleep(i * 1000);
     }
