@@ -16,10 +16,6 @@ module.exports = async (url, proxy) => {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    for (let i = 0; i < 3; i++) {
-        console.log(`Waiting ${i} seconds...`);
-        await sleep(i * 1000);
-    }
     // const baseUrl = url;
     const baseUrl = 'https://www.avito.ru/ipatovo/avtomobili/vaz_lada/priora-ASgBAgICAkTgtg3GmSjitg2qrSg?f=ASgBAgECA0TyCrCKAeC2DcaZKOK2DaqtKAJF~AIXeyJmcm9tIjoyODQ1LCJ0byI6bnVsbH3GmgwWeyJmcm9tIjowLCJ0byI6MjIwMDAwfQ&radius=200&s=104&localPriority=1';
     // const baseUrl = 'https://2ip.ru/';
@@ -64,6 +60,10 @@ module.exports = async (url, proxy) => {
         }
     });
     await page.goto(baseUrl);
+    for (let i = 0; i < 3; i++) {
+        console.log(`Waiting ${i} seconds...`);
+        await sleep(i * 1000);
+    }
 
     // await page.screenshot({path: 'before.png',  fullPage: true });
     // удаление дороже чем у вас
