@@ -64,6 +64,20 @@ module.exports = async (url, proxy) => {
     });
     await page.goto(baseUrl);
 
+    await page.evaluate(`
+      let extra = document.querySelector('div[class*="items-extra"]');
+      if (extra) {
+        let test = true;
+         while(test) {
+            let sib = extra.nextSibling
+            if (sib) {
+                sib.remove();
+            } else {
+                test = false;
+            }
+         }
+      }
+    `);
 
     await page.evaluate(`
       let ads = document.querySelectorAll('div[class*="items-ads"]');
@@ -73,7 +87,8 @@ module.exports = async (url, proxy) => {
         }
       }
     `);
-    // await page.screenshot({path: 'buddy-screenshot.png',  fullPage: true });
+
+    // await page.screenshot({path: 'after.png',  fullPage: true });
     // await page.waitForSelector('span[data-marker="pagination-button/next"]');
     //количество страниц≠
 
