@@ -106,8 +106,15 @@ class MessageHandleService
     private function actionHandler(array $message)
     {
         if ($this->user->getAction() === ActionList::ADDING_LINK) {
+                $url = $message['message']['text'];
+                // чтобы была галочка "сначала в выбранном радиусе"
+                if (!mb_stripos($url, '&localPriority=1')) {
+                    $url .= '&localPriority=1';
+                }
+                // если ссылка мобильная
+                $url = str_replace('m.avito', 'avito', $url);
                 $parseUrl = new ParseUrl();
-                $parseUrl->setUrl($message['message']['text']);
+                $parseUrl->setUrl($url);
                 $parseUrl->setPeriod(1);
                 $parseUrl->setSource('avito');
                 $parseUrl->setIsActive(false);
