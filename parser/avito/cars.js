@@ -20,8 +20,8 @@ module.exports = async (url, proxy) => {
         console.log(`Waiting ${i} seconds...`);
         await sleep(i * 1000);
     }
-    const baseUrl = url;
-    // const baseUrl = 'https://www.avito.ru/ipatovo/avtomobili/vaz_lada/priora-ASgBAgICAkTgtg3GmSjitg2qrSg?f=ASgBAgECA0TyCrCKAeC2DcaZKOK2DaqtKAJF~AIXeyJmcm9tIjoyODQ1LCJ0byI6bnVsbH3GmgwWeyJmcm9tIjowLCJ0byI6MjIwMDAwfQ&radius=200&s=104';
+    // const baseUrl = url;
+    const baseUrl = 'https://www.avito.ru/ipatovo/avtomobili/vaz_lada/priora-ASgBAgICAkTgtg3GmSjitg2qrSg?f=ASgBAgECA0TyCrCKAeC2DcaZKOK2DaqtKAJF~AIXeyJmcm9tIjoyODQ1LCJ0byI6bnVsbH3GmgwWeyJmcm9tIjowLCJ0byI6MjIwMDAwfQ&radius=200&s=104&localPriority=1';
     // const baseUrl = 'https://2ip.ru/';
     // const baseUrl = 'https://arh.antoinevastel.com/bots/areyouheadless';
     // const baseUrl = 'https://bot.sannysoft.com';;
@@ -65,37 +65,41 @@ module.exports = async (url, proxy) => {
     });
     await page.goto(baseUrl);
 
+    // await page.screenshot({path: 'before.png',  fullPage: true });
     // удаление дороже чем у вас
     await page.evaluate(`
-      let extra1 = document.querySelector('div[class*="items-extra"]');
-      if (extra1) {
-        let test = true;
-         while(test) {
-            let sib = extra1.nextSibling
-            if (sib) {
-                sib.remove();
-            } else {
-                test = false;
+      let extra = document.querySelectorAll('div[class*="items-extra"]');
+        if (extra) {
+            for(var i=0; i< extra.length; i++){
+                let test = true;
+    
+                while(test) {
+                    let sib = extra[i].nextSibling
+                    if (sib) {
+                        sib.remove();
+                    } else {
+                        test = false;
+                    }
+                }
             }
-         }
-      }
+        }
     `);
 
-    // удаление объявления в других городах
-    await page.evaluate(`
-      let extra = document.querySelector('div[class*="items-extra"]');
-      if (extra) {
-        let test = true;
-         while(test) {
-            let sib = extra.nextSibling
-            if (sib) {
-                sib.remove();
-            } else {
-                test = false;
-            }
-         }
-      }
-    `);
+    // // удаление объявления в других городах
+    // await page.evaluate(`
+    //   let extra = document.querySelector('div[class*="items-extra"]');
+    //   if (extra) {
+    //     let test = true;
+    //      while(test) {
+    //         let sib = extra.nextSibling
+    //         if (sib) {
+    //             sib.remove();
+    //         } else {
+    //             test = false;
+    //         }
+    //      }
+    //   }
+    // `);
 
     await page.evaluate(`
       let ads = document.querySelectorAll('div[class*="items-ads"]');
