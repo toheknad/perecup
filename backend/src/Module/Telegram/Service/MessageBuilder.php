@@ -172,7 +172,7 @@ class MessageBuilder
     {
         return new \Longman\TelegramBot\Entities\Keyboard(
             ["🔒 Добавить ссылку" , "📓 Мои ссылки"],
-//            ["📓 Руководство", "📖 О сервисе	"],
+            ["💸 Подписка"],
         );
     }
 
@@ -225,6 +225,23 @@ class MessageBuilder
     {
         $text = [];
         $text[] = "<b>Ссылка успешно удалена</b>";
+        $text = implode(PHP_EOL, $text);
+
+
+        Request::sendMessage([
+            'chat_id' => $chatId,
+            'text'    => $text,
+            'parse_mode' => 'HTML',
+        ]);
+    }
+
+    public static function sendSubscribeMessage(int $chatId)
+    {
+        $text = [];
+        $text[] = "<b>⌛️В данный момент у вас нет подписки⌛️</b>";
+        $text[] = "<b>Для того, чтобы ее оформить напишите сюда, что хотите</b>";
+        $text[] = "<b>оформить подписку в боте</b>";
+        $text[] = "<b>Контакт: @ivan_shuga</b>";
         $text = implode(PHP_EOL, $text);
 
 

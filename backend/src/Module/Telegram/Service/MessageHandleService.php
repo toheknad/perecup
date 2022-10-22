@@ -67,7 +67,9 @@ class MessageHandleService
                 MessageBuilder::sendMessageBeforeAddingLink($message['message']['from']['id']);
             } elseif (isset($message['message']['text']) && $message['message']['text'] === '📓 Мои ссылки') {
                 MessageBuilder::sendAllLinksUser($message['message']['from']['id'], $this->user->getParseUrls());
-            } else {
+            } elseif (isset($message['message']['text']) && $message['message']['text'] === '💸 Подписка') {
+                MessageBuilder::sendSubscribeMessage($message['message']['from']['id']);
+            }else {
                 $this->actionHandler($message);
             }
         } catch (\Exception $exception) {

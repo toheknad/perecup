@@ -17,7 +17,7 @@ module.exports = async (url, proxy) => {
     }
 
     const baseUrl = url;
-    // const baseUrl = 'https://www.avito.ru/ipatovo/avtomobili/vaz_lada/priora-ASgBAgICAkTgtg3GmSjitg2qrSg?f=ASgBAgECA0TyCrCKAeC2DcaZKOK2DaqtKAJF~AIXeyJmcm9tIjoyODQ1LCJ0byI6bnVsbH3GmgwWeyJmcm9tIjowLCJ0byI6MjIwMDAwfQ&radius=200&s=104&localPriority=1';
+    // const baseUrl = 'https://avito.ru/pyatigorsk/avtomobili/s_probegom-ASgBAgICAUSGFMjmAQ?f=ASgBAgECA0TyCrCKAYYUyOYB9sQNvrA6AUXGmgwXeyJmcm9tIjowLCJ0byI6NTAwMDAwMH0&moreExpensive=0&radius=0&s=104&presentationType=serp&localPriority=1';
     // const baseUrl = 'https://2ip.ru/';
     // const baseUrl = 'https://arh.antoinevastel.com/bots/areyouheadless';
     // const baseUrl = 'https://bot.sannysoft.com';;
@@ -35,12 +35,12 @@ module.exports = async (url, proxy) => {
             // "--user-agent=" + userAgent + "",
             // "--proxy-server=socks4://176.123.56.58:3629",
             // "--proxy-server="+httpProxy,
-            // "--proxy-server=http://188.143.169.29:30153",
+            // "--proxy-server=http://188.143.169.29:30175",
         ]
     });
 
-    const username = 'iparchitect_17211_21_10_22';
-    const password = 'f6i3rABhAFb6KRTdn8';
+    const username = 'iparchitect_17232_21_10_22';
+    const password = 'D8h2yyiy6rB47Dnh73';
     const page = await browser.newPage();
 
     // await page.authenticate({
@@ -61,13 +61,14 @@ module.exports = async (url, proxy) => {
     });
     await page.goto(baseUrl);
     // слип для проверки удаления объявлений из блока дороже чем вы указали
-    for (let i = 0; i < 3; i++) {
-        console.log(`Waiting ${i} seconds...`);
-        await sleep(i * 1000);
-    }
+    // for (let i = 0; i < 3; i++) {
+    //     console.log(`Waiting ${i} seconds...`);
+    //     await sleep(i * 1000);
+    // }
 
     // await page.screenshot({path: 'before.png',  fullPage: true });
     // удаление дороже чем у вас
+
     await page.evaluate(`
       let extra = document.querySelectorAll('div[class*="items-extra"]');
         if (extra) {
@@ -126,7 +127,12 @@ module.exports = async (url, proxy) => {
             let price = el.querySelector('meta[itemprop="price"]').getAttribute('content');
             let description = el.querySelector('div[data-marker="item-specific-params"]').textContent;
             let time = el.querySelector('div[data-marker="item-date"]').textContent;
-            let city = el.querySelector('div[class*="geo-georeferences"] span span').textContent;
+            let city = '';
+            if (el.querySelector('div[class*="geo-georeferences"] span span')) {
+                city = el.querySelector('div[class*="geo-georeferences"] span span').textContent;
+            } else {
+                city = el.querySelector('span[class*="geo-address"] span').textContent
+            }
             return {
                 name,
                 price,
