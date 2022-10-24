@@ -20,6 +20,7 @@ class ParseUrlCheckedMessage
         public int $userId,
         public bool $isFirstCheck,
         public string $city,
+        public string $image,
     )
     {
     }

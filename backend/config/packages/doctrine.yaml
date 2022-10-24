@@ -40,6 +40,11 @@ doctrine:
                 is_bundle: false
                 prefix: 'App\Module\Telegram\Entity'
                 alias: Telegram
+            Subscribe:
+                dir: '%kernel.project_dir%/src/Module/Subscribe/Entity'
+                is_bundle: false
+                prefix: 'App\Module\Subscribe\Entity'
+                alias: Subscribe
 
 when@test:
     doctrine:

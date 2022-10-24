@@ -30,6 +30,7 @@ class MessageHandleService
 //        echo "<pre>";
 //        print_r($message);
 //        echo "</pre>";
+        $this->entityManager->clear();
         if (isset($message['message']) || isset($message['callback_query'])) {
             if (isset($message['message']['from']['id'])) {
                 $telegramUserId = $message['message']['from']['id'];
@@ -58,17 +59,35 @@ class MessageHandleService
 
             if (isset($message['message']['text']) && $message['message']['text'] === '/start') {
                 MessageBuilder::sendStartMessage($message['message']['from']['id']);
-            } elseif (isset($message['callback_query'])) {
+            } elseif (isset($message['callback_query'])) { // нажатие на кнопку
                 $this->callbackHandler($message);
             } elseif (isset($message['message']['text']) && $message['message']['text'] === '🔒 Добавить ссылку') {
+                if (!$this->user->isUserHasSubscribe()) {
+                    MessageBuilder::subscriptionRequired($message['message']['from']['id']);
+                    return;
+                }
                 $this->user->setAction(ActionList::ADDING_LINK);
                 $this->entityManager->persist($this->user);
                 $this->entityManager->flush();
                 MessageBuilder::sendMessageBeforeAddingLink($message['message']['from']['id']);
             } elseif (isset($message['message']['text']) && $message['message']['text'] === '📓 Мои ссылки') {
+                if (!$this->user->isUserHasSubscribe()) {
+                    MessageBuilder::subscriptionRequired($message['message']['from']['id']);
+                    return;
+                }
+                $this->user->setAction(0);
+                $this->entityManager->persist($this->user);
+                $this->entityManager->flush();
                 MessageBuilder::sendAllLinksUser($message['message']['from']['id'], $this->user->getParseUrls());
             } elseif (isset($message['message']['text']) && $message['message']['text'] === '💸 Подписка') {
-                MessageBuilder::sendSubscribeMessage($message['message']['from']['id']);
+                $this->user->setAction(0);
+                $this->entityManager->persist($this->user);
+                $this->entityManager->flush();
+                if (!$this->user->isUserHasSubscribe()) {
+                    MessageBuilder::abountSubscribe($message['message']['from']['id']);
+                } else {
+                    MessageBuilder::alreadyHasSubscription($message['message']['from']['id']);
+                }
             }else {
                 $this->actionHandler($message);
             }

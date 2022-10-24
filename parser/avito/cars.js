@@ -61,10 +61,10 @@ module.exports = async (url, proxy) => {
     });
     await page.goto(baseUrl);
     // слип для проверки удаления объявлений из блока дороже чем вы указали
-    // for (let i = 0; i < 3; i++) {
-    //     console.log(`Waiting ${i} seconds...`);
-    //     await sleep(i * 1000);
-    // }
+    for (let i = 0; i < 2; i++) {
+        console.log(`Waiting ${i} seconds...`);
+        await sleep(i * 1000);
+    }
 
     // await page.screenshot({path: 'before.png',  fullPage: true });
     // удаление дороже чем у вас
@@ -133,13 +133,20 @@ module.exports = async (url, proxy) => {
             } else {
                 city = el.querySelector('span[class*="geo-address"] span').textContent
             }
+            let image = '';
+            if (el.querySelector('li[class*="photo-slider-list-item"]')) {
+                image = el.querySelector('li[class*="photo-slider-list-item"]').getAttribute('data-marker');
+                image = image.replace('slider-image/image-', '');
+            }
+
             return {
                 name,
                 price,
                 description,
                 time,
                 url,
-                city
+                city,
+                image
             };
         })
     });

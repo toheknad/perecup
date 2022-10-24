@@ -3,11 +3,13 @@
 namespace App\Module\Telegram\Entity;
 
 use App\Module\Parser\Entity\ParseUrl;
+use App\Module\Subscribe\Entity\Subscribe;
 use App\Module\User\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
+use JetBrains\PhpStorm\Pure;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -27,6 +29,9 @@ class TelegramUser
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ParseUrl::class)]
     private Collection $parseUrls;
+
+    #[ORM\OneToOne(targetEntity: Subscribe::class)]
+    private ?Subscribe $subscribe = null;
 
     public function __construct()
     {
@@ -98,5 +103,29 @@ class TelegramUser
         return $this->action;
     }
 
+    /**
+     * @return Subscribe
+     */
+    public function getSubscribe(): ?Subscribe
+    {
+        return $this->subscribe;
+    }
 
+    /**
+     * @param Subscribe $subscribe
+     * @return TelegramUser
+     */
+    public function setSubscribe(Subscribe $subscribe): TelegramUser
+    {
+        $this->subscribe = $subscribe;
+        return $this;
+    }
+
+    #[Pure] public function isUserHasSubscribe(): bool
+    {
+        if ($this->getSubscribe()) {
+            return true;
+        }
+        return false;
+    }
 }

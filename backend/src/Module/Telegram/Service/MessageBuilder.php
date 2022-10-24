@@ -70,9 +70,14 @@ class MessageBuilder
         string $url,
         string $baseUrl,
         ?string $filterName,
-        string $city
+        string $city,
+        string $image,
     )
     {
+//        Request::sendPhoto([
+//            'chat_id' => $chatId,
+//            'photo'   => $image,
+//        ]);
         $url = 'https://www.avito.ru'.$url;
         $text = [];
         $text[] = "<b>🚨Новое объявление🚨</b>";
@@ -84,6 +89,7 @@ class MessageBuilder
         if ($filterName) {
             $text[] = "📁<b>Имя фильтра</b>: {$filterName}";
         }
+        $text[] = '<a href="'.$image.'">Фото</a>';
         $text = implode(PHP_EOL, $text);
 
         $ad = [];
@@ -109,6 +115,7 @@ class MessageBuilder
             'parse_mode' => 'HTML',
             'reply_markup' => $keyboards,
         ]);
+
     }
 
     public static function sendMessageBeforeAddingLink(int $chatId)
@@ -235,7 +242,7 @@ class MessageBuilder
         ]);
     }
 
-    public static function sendSubscribeMessage(int $chatId)
+    public static function abountSubscribe(int $chatId)
     {
         $text = [];
         $text[] = "<b>⌛️В данный момент у вас нет подписки⌛️</b>";
@@ -251,5 +258,38 @@ class MessageBuilder
             'parse_mode' => 'HTML',
         ]);
     }
+
+    public static function subscriptionRequired(int $chatId)
+    {
+        $text = [];
+        $text[] = "<b>🔥 У вас нет подписки 🔥</b>";
+        $text[] = "<b>Для того, чтобы ее приобрести нажмите в меню</b>";
+        $text[] = "<b>💸 Подписка</b>";
+        $text = implode(PHP_EOL, $text);
+
+
+        Request::sendMessage([
+            'chat_id' => $chatId,
+            'text'    => $text,
+            'parse_mode' => 'HTML',
+        ]);
+    }
+
+    public static function alreadyHasSubscription(int $chatId)
+    {
+        $text = [];
+        $text[] = "<b>🔥 Поздравляем! 🔥</b>";
+        $text[] = "<b>У вас уже есть подписка</b>";
+        $text[] = "<b>Осталось дней: 10</b>";
+        $text = implode(PHP_EOL, $text);
+
+
+        Request::sendMessage([
+            'chat_id' => $chatId,
+            'text'    => $text,
+            'parse_mode' => 'HTML',
+        ]);
+    }
+
 
 }
