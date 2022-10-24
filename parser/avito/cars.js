@@ -35,7 +35,7 @@ module.exports = async (url, proxy) => {
             // "--user-agent=" + userAgent + "",
             // "--proxy-server=socks4://176.123.56.58:3629",
             // "--proxy-server="+httpProxy,
-            "--proxy-server=http://188.143.169.29:30153",
+            // "--proxy-server=http://188.143.169.29:30153",
         ]
     });
 
@@ -43,10 +43,10 @@ module.exports = async (url, proxy) => {
     const password = 'f6i3rABhAFb6KRTdn8';
     const page = await browser.newPage();
 
-    await page.authenticate({
-        username: username,
-        password: password,
-    });
+    // await page.authenticate({
+    //     username: username,
+    //     password: password,
+    // });
 
     console.log(""+userAgent);
     console.log(proxy);
