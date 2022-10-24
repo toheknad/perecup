@@ -78,12 +78,13 @@ class MessageBuilder
 //            'chat_id' => $chatId,
 //            'photo'   => $image,
 //        ]);
+        $priceFormated = number_format($price, 0, '.', ' ');
         $url = 'https://www.avito.ru'.$url;
         $text = [];
         $text[] = "<b>🚨Новое объявление🚨</b>";
         $text[] = "";
         $text[] = "🚗<b>Имя</b>: {$name}";
-        $text[] = "💰<b>Цена</b>: {$price}";
+        $text[] = "💰<b>Цена</b>: {$priceFormated}";
         $text[] = "📖<b>Описание</b>: {$description}";
         $text[] = "🌆<b>Город</b>: {$city}";
         if ($filterName) {
