@@ -35,7 +35,7 @@ module.exports = async (url, proxy) => {
             // "--user-agent=" + userAgent + "",
             // "--proxy-server=socks4://176.123.56.58:3629",
             // "--proxy-server="+httpProxy,
-            "--proxy-server=http://20.210.113.32:8123",
+            "--proxy-server=https://20.210.113.32:8123",
         ]
     });
 
