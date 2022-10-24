@@ -35,12 +35,12 @@ module.exports = async (url, proxy) => {
             // "--user-agent=" + userAgent + "",
             // "--proxy-server=socks4://176.123.56.58:3629",
             // "--proxy-server="+httpProxy,
-            "--proxy-server=http://188.143.169.29:30175",
+            "--proxy-server=http://188.143.169.29:30153",
         ]
     });
 
-    const username = 'iparchitect_17232_21_10_22';
-    const password = 'D8h2yyiy6rB47Dnh73';
+    const username = 'iparchitect_17211_21_10_22';
+    const password = 'f6i3rABhAFb6KRTdn8';
     const page = await browser.newPage();
 
     await page.authenticate({
