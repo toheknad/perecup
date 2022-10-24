@@ -61,10 +61,10 @@ module.exports = async (url, proxy) => {
     });
     await page.goto(baseUrl);
     // слип для проверки удаления объявлений из блока дороже чем вы указали
-    for (let i = 0; i < 2; i++) {
-        console.log(`Waiting ${i} seconds...`);
-        await sleep(i * 1000);
-    }
+    // for (let i = 0; i < 2; i++) {
+    //     console.log(`Waiting ${i} seconds...`);
+    //     await sleep(i * 1000);
+    // }
 
     // await page.screenshot({path: 'before.png',  fullPage: true });
     // удаление дороже чем у вас
