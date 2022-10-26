@@ -39,7 +39,6 @@ class MessageHandleService
             }
             $this->user = $this->getUserByChatId($telegramUserId);
         }
-        print_r(count($this->user->getParseUrls()->toArray()));
         $this->handleMessageByType($message);
 
     }
