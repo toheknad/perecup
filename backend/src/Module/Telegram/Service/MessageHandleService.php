@@ -4,6 +4,8 @@ namespace App\Module\Telegram\Service;
 
 use App\Module\Parser\Entity\ParseUrl;
 use App\Module\Parser\Repository\ParseUrlRepository;
+use App\Module\Subscribe\Entity\Subscribe;
+use App\Module\Subscribe\Repository\SubscribeRepository;
 use App\Module\Telegram\Entity\TelegramUser;
 use App\Module\Telegram\Repository\TelegramUserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,6 +20,7 @@ class MessageHandleService
         protected EntityManagerInterface $entityManager,
         protected TelegramUserRepository $telegramUserRepository,
         protected ParseUrlRepository $parseUrlRepository,
+        protected SubscribeRepository $subscribeRepository,
     )
     {
     }
@@ -58,17 +61,11 @@ class MessageHandleService
 
             if (isset($message['message']['text']) && $message['message']['text'] === '/start') {
                 MessageBuilder::sendStartMessage($message['message']['from']['id']);
-            } elseif (isset($message['callback_query'])) { // нажатие на кнопку
-                $this->callbackHandler($message);
-            } elseif (isset($message['message']['text']) && $message['message']['text'] === '🔒 Добавить ссылку') {
-                if (!$this->user->isUserHasSubscribe()) {
-                    MessageBuilder::subscriptionRequired($message['message']['from']['id']);
-                    return;
+                if (!$this->user->getSubscribe()) {
+                    MessageBuilder::sendAboutTrialMode($message['message']['from']['id']);
                 }
-                $this->user->setAction(ActionList::ADDING_LINK);
-                $this->entityManager->persist($this->user);
-                $this->entityManager->flush();
-                MessageBuilder::sendMessageBeforeAddingLink($message['message']['from']['id']);
+            } elseif (isset($message['message']['text']) && $message['message']['text'] === '🔒 Добавить ссылку') {
+                $this->menuButtonAddLink($message['message']['from']['id']);
             } elseif (isset($message['message']['text']) && $message['message']['text'] === '📓 Мои ссылки') {
                 if (!$this->user->isUserHasSubscribe()) {
                     MessageBuilder::subscriptionRequired($message['message']['from']['id']);
@@ -87,7 +84,9 @@ class MessageHandleService
                 } else {
                     MessageBuilder::alreadyHasSubscription($message['message']['from']['id']);
                 }
-            }else {
+            } elseif (isset($message['callback_query'])) { // нажатие на кнопку
+                $this->callbackHandler($message);
+            } else {
                 $this->actionHandler($message);
             }
         } catch (\Exception $exception) {
@@ -185,5 +184,41 @@ class MessageHandleService
                 MessageBuilder::sendMessageLinkDelete($this->user->getChatId());
             }
         }
+
+        if ($data['type'] === 'trial') {
+            if ($data['action'] === 'start') {
+                // если еще ни разу не было подписки у юзера
+                if (!$this->subscribeRepository->findOneBy(['telegramUser' => $this->user])) {
+                    $subscribe = new Subscribe();
+                    $subscribe->setTelegramUser($this->user);
+                    $subscribe->setTrial();
+
+                    $this->user->setSubscribe($subscribe);
+                    $this->entityManager->persist($this->user);
+                    $this->entityManager->flush();
+                    MessageBuilder::sendTrialActivated($this->user->getChatId());
+                    return;
+                }
+                MessageBuilder::sendTrialAlreadyActivated($this->user->getChatId());
+            }
+        }
+
+        if ($data['type'] === 'menu') {
+            if ($data['action'] === 'add-link') {
+                $this->menuButtonAddLink($this->user->getChatId());
+            }
+        }
+    }
+
+    private function menuButtonAddLink(int $chatId)
+    {
+        if (!$this->user->isUserHasSubscribe()) {
+            MessageBuilder::subscriptionRequired($chatId);
+            return;
+        }
+        $this->user->setAction(ActionList::ADDING_LINK);
+        $this->entityManager->persist($this->user);
+        $this->entityManager->flush();
+        MessageBuilder::sendMessageBeforeAddingLink($chatId);
     }
 }

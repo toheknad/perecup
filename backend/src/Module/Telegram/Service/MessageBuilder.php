@@ -1,13 +1,10 @@
 <?php
 namespace App\Module\Telegram\Service;
 
-use App\Entity\User;
 use App\Module\Parser\Entity\ParseUrl;
-use App\Service\Telegram\Keyboard\Keyboard;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\PersistentCollection;
 use Longman\TelegramBot\Entities\InlineKeyboard;
+use Longman\TelegramBot\Entities\Keyboard;
 use Longman\TelegramBot\Request;
 
 class MessageBuilder
@@ -26,6 +23,7 @@ class MessageBuilder
             'chat_id' => $chatId,
             'text'    => $text,
             'parse_mode' => 'HTML',
+            'reply_markup' =>  self::getKeyboardNotAuth(),
         ]);
     }
 
@@ -55,7 +53,108 @@ class MessageBuilder
             'chat_id' => $chatId,
             'text'    => $text,
             'parse_mode' => 'HTML',
-            'reply_markup' =>  self::getKeyboard(),
+            'reply_markup' =>  self::getKeyboardAuth(),
+        ]);
+    }
+
+    public static function sendAboutTrialMode(int $chatId)
+    {
+        $text = [];
+        $text[] = "<b>Попробуйте демо-режим бота</b>";
+        $text[] = "";
+        $text[] = "⚠️ Вам будет доступно <b>1 бесплатная ссылка на 2 дня</b> для того, чтобы увидеть как работает бот";
+        $text[] = "";
+        $text = implode(PHP_EOL, $text);
+
+        $startTrialButton = [];
+        $startTrialButton['text'] = '✅ Активировать демо-режим';
+        $startTrialButton['callback_data'] = json_encode(['type' => 'trial', 'action' => 'start']);
+
+
+        $keyboards = new InlineKeyboard(
+            [
+                $startTrialButton,
+            ],
+        );
+
+
+        Request::sendMessage([
+            'chat_id' => $chatId,
+            'text'    => $text,
+            'parse_mode' => 'HTML',
+            'reply_markup' =>  $keyboards,
+        ]);
+    }
+
+    public static function sendTrialAlreadyActivated(int $chatId)
+    {
+        $text = [];
+        $text[] = "👋 <b>Вы уже воспользовались демо режимом!</b>";
+        $text[] = "";
+        $text[] = "Оформите подписку и получите весь функционал бота";
+
+        $text = implode(PHP_EOL, $text);
+
+//        $startTrialButton = [];
+//        $startTrialButton['text'] = '💸 Подписка';
+//
+//
+//        $keyboards = new InlineKeyboard(
+//            [
+//                $startTrialButton,
+//            ],
+//        );
+
+//        $keyboards = [];
+
+        // Simple digits
+//        $keyboards = new Keyboard(
+//            ['💸 Подписка'],
+//        );
+
+//        $keyboards->setResizeKeyboard(true);
+
+
+
+        Request::sendMessage([
+            'chat_id' => $chatId,
+            'text'    => $text,
+            'parse_mode' => 'HTML',
+//            'reply_markup' =>  $keyboards,
+        ]);
+    }
+    public static function sendTrialActivated(int $chatId)
+    {
+        $text = [];
+        $text[] = "👋 <b>Отлично!</b>";
+        $text[] = "";
+        $text[] = "Демо режим активирован, теперь вы можете настроить бота для поиска машин";
+        $text[] = "Если вы еще не знакомы с работой бота, то вот вам инструкции, обязательно посмотрите ее перед тем как начать";
+        $text[] = "";
+        $text[] = '📹 <b><a href="https://www.youtube.com/watch?v=Jz6nQDvnXUM&t=35s"> Видео-инструкция по использованию бота</a></b>';
+        $text[] = '💬 <b><a href="https://trite-jackrabbit-ce3.notion.site/bibi-839950d75f7c49efaf7ef1aef1347e30">Инструкция по использованию бота</a></b>';
+        $text[] = "";
+        $text[] = "Нажмите кнопку ниже, чтобы добавить свою первую ссылку";
+
+        $text = implode(PHP_EOL, $text);
+
+        $startTrialButton = [];
+        $startTrialButton['text'] = '🔒 Добавить ссылку';
+        $startTrialButton['callback_data'] = json_encode(['type' => 'menu', 'action' => 'add-link']);
+
+
+        $keyboards = new InlineKeyboard(
+            [
+                $startTrialButton,
+            ],
+        );
+
+
+        Request::sendMessage([
+            'chat_id' => $chatId,
+            'text'    => $text,
+            'parse_mode' => 'HTML',
+            'reply_markup' =>  $keyboards,
         ]);
     }
 
@@ -187,12 +286,19 @@ class MessageBuilder
         ]);
     }
 
-    public static function getKeyboard()
+    public static function getKeyboardAuth()
     {
-        return new \Longman\TelegramBot\Entities\Keyboard(
+        return (new \Longman\TelegramBot\Entities\Keyboard(
             ["🔒 Добавить ссылку" , "📓 Мои ссылки"],
             ["💸 Подписка"],
-        );
+        ))->setResizeKeyboard(true);
+    }
+
+    public static function getKeyboardNotAuth()
+    {
+        return (new \Longman\TelegramBot\Entities\Keyboard(
+            ["💸 Начать пользоваться"],
+        ))->setResizeKeyboard(true);
     }
 
     public static function sendAllLinksUser(int $chatId, Collection $links)
@@ -275,8 +381,8 @@ class MessageBuilder
     public static function subscriptionRequired(int $chatId)
     {
         $text = [];
-        $text[] = "<b>🔥 У вас нет подписки 🔥</b>";
-        $text[] = "<b>Для того, чтобы ее приобрести нажмите в меню</b>";
+        $text[] = "<b>🔥 Оформление подписки 🔥</b>";
+        $text[] = "В данный момент у нас ";
         $text[] = "<b>💸 Подписка</b>";
         $text = implode(PHP_EOL, $text);
 

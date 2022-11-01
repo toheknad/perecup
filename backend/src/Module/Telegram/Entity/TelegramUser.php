@@ -27,10 +27,10 @@ class TelegramUser
     #[ORM\Column(type: 'integer')]
     private int $action = 0;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ParseUrl::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ParseUrl::class, cascade: ["remove"])]
     private Collection $parseUrls;
 
-    #[ORM\OneToOne(targetEntity: Subscribe::class)]
+    #[ORM\OneToOne(targetEntity: Subscribe::class, cascade: ["persist", "remove"])]
     private ?Subscribe $subscribe = null;
 
     public function __construct()

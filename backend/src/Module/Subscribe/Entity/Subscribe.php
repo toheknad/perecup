@@ -21,14 +21,28 @@ class Subscribe
     #[ORM\Column(type: 'integer')]
     private int $id;
 
-    #[ORM\Column(type: 'datetime')]
-    private \DateTimeImmutable $from;
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: 'datetime')]
-    private \DateTimeImmutable $to;
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $activatedFrom;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $activatedTo;
 
     #[ORM\OneToOne(targetEntity: TelegramUser::class)]
     private TelegramUser $telegramUser;
+
+    #[ORM\Column(type: 'integer')]
+    private int $type;
+
+    public const SUBSCRIBE_TYPE_TRIAL = 1;
+    public const SUBSCRIBE_TYPE_STANDART = 2;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -86,4 +100,86 @@ class Subscribe
     {
         $this->telegramUser = $telegramUser;
     }
+
+    /**
+     * @return int
+     */
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param int $type
+     * @return Subscribe
+     */
+    public function setType(int $type): Subscribe
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    public function setTrial(): self
+    {
+        $this->setType(self::SUBSCRIBE_TYPE_TRIAL);
+        $this->setActivatedFrom(new \DateTimeImmutable());
+        $this->setActivatedTo((new \DateTimeImmutable())->modify('+2 days'));
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTimeImmutable $createdAt
+     * @return Subscribe
+     */
+    public function setCreatedAt(\DateTimeImmutable $createdAt): Subscribe
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getActivatedFrom(): \DateTimeImmutable
+    {
+        return $this->activatedFrom;
+    }
+
+    /**
+     * @param \DateTimeImmutable $activatedFrom
+     * @return Subscribe
+     */
+    public function setActivatedFrom(\DateTimeImmutable $activatedFrom): Subscribe
+    {
+        $this->activatedFrom = $activatedFrom;
+        return $this;
+    }
+
+    /**
+     * @param \DateTimeImmutable $activatedTo
+     * @return Subscribe
+     */
+    public function setActivatedTo(\DateTimeImmutable $activatedTo): Subscribe
+    {
+        $this->activatedTo = $activatedTo;
+        return $this;
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getActivatedTo(): \DateTimeImmutable
+    {
+        return $this->activatedTo;
+    }
+
 }
