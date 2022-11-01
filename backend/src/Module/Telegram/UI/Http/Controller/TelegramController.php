@@ -9,6 +9,7 @@ use Longman\TelegramBot\Telegram;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class TelegramController extends AbstractController
@@ -23,7 +24,7 @@ class TelegramController extends AbstractController
     }
 
     #[Route('/telegram/get-messages', name: 'telegram_get_messages', methods: 'GET')]
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): Response
     {
 //        $messages = $this->telegram->handleGetUpdates()->getRawData();
 //        foreach ($messages['result'] as $message) {
@@ -56,7 +57,9 @@ class TelegramController extends AbstractController
 
         $data .= "\nRequest body:\n";
 
-        return $this->json($data, 200);
+        dump($data);
+        die();
+        return $this->json(json_encode($data, JSON_PRETTY_PRINT), 200);
     }
 
 }
