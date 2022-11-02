@@ -9,7 +9,6 @@ use Longman\TelegramBot\Telegram;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class TelegramController extends AbstractController
@@ -24,42 +23,14 @@ class TelegramController extends AbstractController
     }
 
     #[Route('/telegram/get-messages', name: 'telegram_get_messages', methods: 'GET')]
-    public function index(Request $request): Response
+    public function index(Request $request): JsonResponse
     {
-//        $messages = $this->telegram->handleGetUpdates()->getRawData();
-//        foreach ($messages['result'] as $message) {
-//            $this->messageHandleService->start($message);
-//        }
-
-        $data = sprintf(
-            "%s %s %s\n\nHTTP headers:\n",
-            $_SERVER['REQUEST_METHOD'],
-            $_SERVER['REQUEST_URI'],
-            $_SERVER['SERVER_PROTOCOL']
-        );
-
-        $headerList = [];
-        foreach ($_SERVER as $name => $value) {
-            if (preg_match('/^HTTP_/', $name)) {
-                // convert HTTP_HEADER_NAME to Header-Name
-                $name = strtr(substr($name, 5), '_', ' ');
-                $name = ucwords(strtolower($name));
-                $name = strtr($name, ' ', '-');
-
-                // add to list
-                $headerList[$name] = $value;
-            }
+        $messages = $this->telegram->handleGetUpdates()->getRawData();
+        foreach ($messages['result'] as $message) {
+            $this->messageHandleService->start($message);
         }
 
-        foreach ($headerList as $name => $value) {
-            $data .= $name . ': ' . $value . "\n";
-        }
-
-        $data .= "\nRequest body:\n";
-
-        dump($data);
-        die();
-        return $this->json(json_encode($data, JSON_PRETTY_PRINT), 200);
+        return $this->json(['success'], 200);
     }
 
 }
