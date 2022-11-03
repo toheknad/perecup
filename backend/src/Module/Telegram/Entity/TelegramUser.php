@@ -123,9 +123,40 @@ class TelegramUser
 
     #[Pure] public function isUserHasSubscribe(): bool
     {
-        if ($this->getSubscribe()) {
+        if ($this->getSubscribe() && !$this->isSubscriptionEnded()) {
             return true;
         }
         return false;
+    }
+
+    public function getMaxAmountLinks(): int
+    {
+        if ($this->getSubscribe()?->getType() === Subscribe::SUBSCRIBE_TYPE_TRIAL) {
+            return 1;
+        }
+
+        if ($this->getSubscribe()?->getType() === Subscribe::SUBSCRIBE_TYPE_STANDART) {
+            return 5;
+        }
+    }
+
+    public function getAmountLinks(): int
+    {
+        return count($this->getParseUrls());
+    }
+
+    public function hasUserTrial(): bool
+    {
+        return $this->getSubscribe()->getType() === Subscribe::SUBSCRIBE_TYPE_TRIAL;
+    }
+
+    public function hasUserStandart(): bool
+    {
+        return $this->getSubscribe()->getType() === Subscribe::SUBSCRIBE_TYPE_STANDART;
+    }
+
+    public function isSubscriptionEnded(): bool
+    {
+        return (new \DateTimeImmutable()) > $this->getSubscribe()->getActivatedTo();
     }
 }

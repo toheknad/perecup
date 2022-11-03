@@ -2,6 +2,7 @@
 namespace App\Module\Telegram\Service;
 
 use App\Module\Parser\Entity\ParseUrl;
+use App\Module\Telegram\Entity\TelegramUser;
 use Doctrine\Common\Collections\Collection;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\Keyboard;
@@ -123,6 +124,7 @@ class MessageBuilder
 //            'reply_markup' =>  $keyboards,
         ]);
     }
+
     public static function sendTrialActivated(int $chatId)
     {
         $text = [];
@@ -396,28 +398,104 @@ class MessageBuilder
         ]);
     }
 
-    public static function subscriptionRequired(int $chatId)
+    public static function alreadyHasSubscription(TelegramUser $user)
     {
         $text = [];
-        $text[] = "<b>🔥 Оформление подписки 🔥</b>";
-        $text[] = "В данный момент у нас ";
-        $text[] = "<b>💸 Подписка</b>";
+        $keyboards = [];
+        if ($user->hasUserTrial()) {
+            $text[] = "<b>⌛️У вас демо-режим ⌛️</b>";
+        }
+        if ($user->hasUserStandart()) {
+            $text[] = "<b>⌛️У вас стандартная подписка⌛️</b>";
+        }
+        $text[] = '';
+        $interval = (new \DateTimeImmutable())->diff($user->getSubscribe()->getActivatedTo());
+        $amountDays =  $interval->format('%a');
+        if ((int)$amountDays === 0) {
+            $text[] = "Сегодня последний день подписки";
+        } else {
+            $text[] = "Осталось дней: <b>{$amountDays}</b>";
+        }
+
+        if ((int)$amountDays === 0 || $user->hasUserTrial()) {
+            $text[] = '';
+            $text[] = "<b>Хотите продлить подписку?</b>";
+            $text[] = "🔥 Подписка на 1 месяц - <b>350 рублей</b>";
+            $text[] = "Вам будет доступно 5 ссылок для отслеживания новых машин";
+
+            $oneMonth = [];
+            $oneMonth['text'] = 'Оформить на 1 месяц';
+            $oneMonth['url'] = 'https://vk.com';
+
+
+            $keyboards = new InlineKeyboard(
+                [
+                    $oneMonth
+                ],
+            );
+        }
         $text = implode(PHP_EOL, $text);
+
+        $response = [
+            'chat_id' => $user->getChatId(),
+            'text'    => $text,
+            'parse_mode' => 'HTML',
+        ];
+
+        if (!empty($keyboards)) {
+            $response['reply_markup'] = $keyboards;
+        }
+        Request::sendMessage($response);
+    }
+
+    public static function maxAmountLinks(int $chatId)
+    {
+        $text = [];
+        $text[] = "👋 <b>У вас лимит по ссылкам!</b>";
+        $text[] = "";
+        $text[] = "Если у вас демо режим, то купите подписку, чтобы иметь больше ссылок";
+
+        $text = implode(PHP_EOL, $text);
+
+        $startTrialButton = [];
+        $startTrialButton['text'] = '💸 Подписка';
+        $startTrialButton['callback_data'] = json_encode(['type' => 'menu', 'action' => 'subscription']);
+
+
+        $keyboards = new InlineKeyboard(
+            [
+                $startTrialButton,
+            ],
+        );
 
 
         Request::sendMessage([
             'chat_id' => $chatId,
             'text'    => $text,
             'parse_mode' => 'HTML',
+            'reply_markup' =>  $keyboards,
         ]);
     }
 
-    public static function alreadyHasSubscription(int $chatId)
+    public static function wrongLink(int $chatId)
     {
         $text = [];
-        $text[] = "<b>🔥 Поздравляем! 🔥</b>";
-        $text[] = "<b>У вас уже есть подписка</b>";
-        $text[] = "<b>Осталось дней: 10</b>";
+        $text[] = "👋 <b>Неправильная ссылка!</b>";
+        $text[] = "";
+        $text[] = "Вы уверены, что это ссылка из авито?";
+        $text[] = "Попробуйте еще раз";
+
+        $startTrialButton = [];
+        $startTrialButton['text'] = '🔒 Добавить ссылку';
+        $startTrialButton['callback_data'] = json_encode(['type' => 'menu', 'action' => 'add-link']);
+
+
+        $keyboards = new InlineKeyboard(
+            [
+                $startTrialButton,
+            ],
+        );
+
         $text = implode(PHP_EOL, $text);
 
 
@@ -425,6 +503,7 @@ class MessageBuilder
             'chat_id' => $chatId,
             'text'    => $text,
             'parse_mode' => 'HTML',
+            'reply_markup' => $keyboards
         ]);
     }
 

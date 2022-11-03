@@ -65,10 +65,10 @@ class MessageHandleService
                     MessageBuilder::sendAboutTrialMode($message['message']['from']['id']);
                 }
             } elseif (isset($message['message']['text']) && $message['message']['text'] === '🔒 Добавить ссылку') {
-                $this->menuButtonAddLink($message['message']['from']['id']);
+                $this->menuButtonAddLink();
             } elseif (isset($message['message']['text']) && $message['message']['text'] === '📓 Мои ссылки') {
                 if (!$this->user->isUserHasSubscribe()) {
-                    MessageBuilder::subscriptionRequired($message['message']['from']['id']);
+                    MessageBuilder::abountSubscribe($message['message']['from']['id']);
                     return;
                 }
                 $this->user->setAction(0);
@@ -76,14 +76,7 @@ class MessageHandleService
                 $this->entityManager->flush();
                 MessageBuilder::sendAllLinksUser($message['message']['from']['id'], $this->user->getParseUrls());
             } elseif (isset($message['message']['text']) && $message['message']['text'] === '💸 Подписка') {
-                $this->user->setAction(0);
-                $this->entityManager->persist($this->user);
-                $this->entityManager->flush();
-                if (!$this->user->isUserHasSubscribe()) {
-                    MessageBuilder::abountSubscribe($message['message']['from']['id']);
-                } else {
-                    MessageBuilder::alreadyHasSubscription($message['message']['from']['id']);
-                }
+                $this->menuSubscription();
             } elseif (isset($message['callback_query'])) { // нажатие на кнопку
                 $this->callbackHandler($message);
             } else {
@@ -126,6 +119,14 @@ class MessageHandleService
     {
         if ($this->user->getAction() === ActionList::ADDING_LINK) {
                 $url = $message['message']['text'];
+
+                if (!mb_stripos($url, 'avito.ru')) {
+                    $this->user->setAction(0);
+                    $this->entityManager->flush();
+                    $this->entityManager->clear();
+                    MessageBuilder::wrongLink($message['message']['from']['id']);
+                    return;
+                }
                 // чтобы была галочка "сначала в выбранном радиусе"
                 if (mb_stripos($url, '&localPriority=0')) {
                     $url = str_replace('&localPriority=0', '&localPriority=1', $url);
@@ -179,9 +180,11 @@ class MessageHandleService
         if ($data['type'] === 'link') {
             if ($data['action'] === 'delete') {
                 $parseUrl = $this->parseUrlRepository->find($data['linkId']);
-                $this->entityManager->remove($parseUrl);
-                $this->entityManager->flush();
-                MessageBuilder::sendMessageLinkDelete($this->user->getChatId());
+                if ($parseUrl) {
+                    $this->entityManager->remove($parseUrl);
+                    $this->entityManager->flush();
+                    MessageBuilder::sendMessageLinkDelete($this->user->getChatId());
+                }
             }
         }
 
@@ -205,20 +208,39 @@ class MessageHandleService
 
         if ($data['type'] === 'menu') {
             if ($data['action'] === 'add-link') {
-                $this->menuButtonAddLink($this->user->getChatId());
+                $this->menuButtonAddLink();
+            }
+            if ($data['action'] === 'subscription') {
+                $this->menuSubscription();
             }
         }
     }
 
-    private function menuButtonAddLink(int $chatId)
+    private function menuButtonAddLink()
     {
         if (!$this->user->isUserHasSubscribe()) {
-            MessageBuilder::subscriptionRequired($chatId);
+            MessageBuilder::abountSubscribe($this->user->getChatId());
             return;
         }
-        $this->user->setAction(ActionList::ADDING_LINK);
+        if ($this->user->getMaxAmountLinks() > $this->user->getAmountLinks()) {
+            $this->user->setAction(ActionList::ADDING_LINK);
+            $this->entityManager->persist($this->user);
+            $this->entityManager->flush();
+            MessageBuilder::sendMessageBeforeAddingLink($this->user->getChatId());
+        } else {
+            MessageBuilder::maxAmountLinks($this->user->getChatId());
+        }
+    }
+
+    private function menuSubscription()
+    {
+        $this->user->setAction(0);
         $this->entityManager->persist($this->user);
         $this->entityManager->flush();
-        MessageBuilder::sendMessageBeforeAddingLink($chatId);
+        if ($this->user->isUserHasSubscribe()) {
+            MessageBuilder::alreadyHasSubscription($this->user);
+        } else {
+            MessageBuilder::abountSubscribe($this->user->getChatId());
+        }
     }
 }
