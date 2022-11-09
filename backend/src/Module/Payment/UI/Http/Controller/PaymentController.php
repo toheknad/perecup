@@ -83,46 +83,44 @@ class PaymentController extends AbstractController
     {
 //        file_put_contents('redirect.txt',  'TESDAD');
         $data = $request->toArray();
-        try {
-            if (!$data) {
-                return $this->json(['Request is empty'], 200);
-            }
-            if (!isset($data['event'])) {
-                return $this->json(['Array does not have event item'], 200);
-            }
 
-            if ($data['event'] === 'payment.succeeded') {
-                $paymentUuid = $data['object']['id'];
-                $paymentStatus = $data['object']['status'];
-                $userPayment = $paymentRepository->find($paymentUuid);
-
-                /** @var Payment $userPayment */
-                if (!$userPayment) {
-                    return $this->json(['Users payment is not found'], 200);
-                }
-
-                $user = $userPayment->getTelegramUser();
-
-                $userPayment->setStatus($paymentStatus);
-                if ($userPayment->getSubscriptionType() == Subscribe::SUBSCRIBE_TYPE_ONE_WEEK) {
-                    $subscription = Subscribe::makeOneWeekSubscription($userPayment->getTelegramUser());
-                } elseif ($userPayment->getSubscriptionType() == Subscribe::SUBSCRIBE_TYPE_TWO_WEEK) {
-                    $subscription = Subscribe::makeTwoWeekSubscription($userPayment->getTelegramUser());
-                } elseif ($userPayment->getSubscriptionType() == Subscribe::SUBSCRIBE_TYPE_MONTH) {
-                    $subscription = Subscribe::makeOneMonthSubscription($userPayment->getTelegramUser());
-                }
-
-                $user->setSubscribe($subscription);
-
-                $this->entityManager->persist($user);
-                $this->entityManager->flush();
-
-                MessageBuilder::subscriptionActivated($user, $userPayment->getSubscriptionType());
-            }
-        } catch (\Throwable $e) {
-            file_put_contents('error.txt',  $e->getMessage());
+        if (!$data) {
+            return $this->json(['Request is empty'], 200);
         }
-        return $this->json(['Somethins is wrong with userId or subscription type'], 200);
+        if (!isset($data['event'])) {
+            return $this->json(['Array does not have event item'], 200);
+        }
+
+        if ($data['event'] === 'payment.succeeded') {
+            $paymentUuid = $data['object']['id'];
+            $paymentStatus = $data['object']['status'];
+            $userPayment = $paymentRepository->find($paymentUuid);
+
+            /** @var Payment $userPayment */
+            if (!$userPayment) {
+                return $this->json(['Users payment is not found'], 200);
+            }
+
+            $user = $userPayment->getTelegramUser();
+
+            $userPayment->setStatus($paymentStatus);
+            if ($userPayment->getSubscriptionType() == Subscribe::SUBSCRIBE_TYPE_ONE_WEEK) {
+                $subscription = Subscribe::makeOneWeekSubscription($userPayment->getTelegramUser());
+            } elseif ($userPayment->getSubscriptionType() == Subscribe::SUBSCRIBE_TYPE_TWO_WEEK) {
+                $subscription = Subscribe::makeTwoWeekSubscription($userPayment->getTelegramUser());
+            } elseif ($userPayment->getSubscriptionType() == Subscribe::SUBSCRIBE_TYPE_MONTH) {
+                $subscription = Subscribe::makeOneMonthSubscription($userPayment->getTelegramUser());
+            }
+
+            $user->setSubscribe($subscription);
+
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+
+            MessageBuilder::subscriptionActivated($user, $userPayment->getSubscriptionType());
+        }
+
+        return $this->json(['Ok'], 200);
     }
 
     private function definePriceAndDescription(int $subscriptionType)
