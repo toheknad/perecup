@@ -81,7 +81,7 @@ class PaymentController extends AbstractController
         PaymentRepository $paymentRepository,
     ): Response
     {
-        file_put_contents('redirect.txt',  'TESDAD');
+//        file_put_contents('redirect.txt',  'TESDAD');
         $data = $request->toArray();
         try {
             if (!$data) {
