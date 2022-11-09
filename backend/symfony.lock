@@ -580,5 +580,8 @@
     },
     "webmozart/assert": {
         "version": "1.10.0"
+    },
+    "yoomoney/yookassa-sdk-php": {
+        "version": "2.7.0"
     }
 }

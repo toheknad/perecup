@@ -20,6 +20,12 @@ class Proxy
     #[ORM\Column(type: 'string', length: 180)]
     private string $proxy;
 
+    #[ORM\Column(type: 'string', length: 180, nullable: true)]
+    private ?string $login;
+
+    #[ORM\Column(type: 'string', length: 180, nullable: true)]
+    private ?string $password;
+
     #[ORM\Column(type: 'boolean')]
     private bool $status;
 
@@ -57,6 +63,51 @@ class Proxy
     {
         $this->status = $status;
         return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLogin(): ?string
+    {
+        return $this->login;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param string|null $login
+     * @return Proxy
+     */
+    public function setLogin(?string $login): Proxy
+    {
+        $this->login = $login;
+        return $this;
+    }
+
+    /**
+     * @param string|null $password
+     * @return Proxy
+     */
+    public function setPassword(?string $password): Proxy
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+    public function getArray()
+    {
+        return [
+            'ip' => $this->getProxy(),
+            'login' => $this->login,
+            'password' => $this->password,
+        ];
     }
 
 }

@@ -50,18 +50,18 @@ class ParserSendParseUrlCommand extends Command
             $lstParseUrl = $this->parseUrlRepository->getActiveNow();
             $dt = (new DateTime())->format('Y-m-d H:i:s');
             echo $dt . " - START". PHP_EOL;
-            sleep(250);
             foreach ($lstParseUrl as $item) {
                 $proxy = $this->proxyRepository->getNextProxy();
-                echo $dt . " - LINK ADD". PHP_EOL;
+//                echo $dt . " - LINK ADD". PHP_EOL;
                 if ($this->urlCheckedRepository->count(['parseUrl' => $item]) === 0) {
-                    $parseUrlMessage = ParseUrlMessage::createFromEntity($item, $proxy->getProxy(), true);
+                    $parseUrlMessage = ParseUrlMessage::createFromEntity($item, $proxy->getArray(), true);
                 } else {
-                    $parseUrlMessage = ParseUrlMessage::createFromEntity($item, $proxy->getProxy(), false);
+                    $parseUrlMessage = ParseUrlMessage::createFromEntity($item, $proxy->getArray(), false);
                 }
+
                 $en = $this->messageBus->dispatch($parseUrlMessage);
-                $this->logger->debug('Отправлено в очередь!', [$en]);
             }
+            sleep(120);
             $this->logger->info('Успешно заврешено, [время выполнения]', [microtime(true) - $ts]);
         }
 

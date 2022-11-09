@@ -10,6 +10,7 @@ use App\Module\Telegram\Entity\TelegramUser;
 use App\Module\Telegram\Repository\TelegramUserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Longman\TelegramBot\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MessageHandleService
 {
@@ -21,6 +22,8 @@ class MessageHandleService
         protected TelegramUserRepository $telegramUserRepository,
         protected ParseUrlRepository $parseUrlRepository,
         protected SubscribeRepository $subscribeRepository,
+        protected UrlGeneratorInterface $router,
+        protected MessageBuilder $messageBuilder,
     )
     {
     }
@@ -61,14 +64,14 @@ class MessageHandleService
 
             if (isset($message['message']['text']) && $message['message']['text'] === '/start') {
                 MessageBuilder::sendStartMessage($message['message']['from']['id']);
-                if (!$this->user->getSubscribe()) {
+                if (!$this->user->getSubscribe()->last()) {
                     MessageBuilder::sendAboutTrialMode($message['message']['from']['id']);
                 }
             } elseif (isset($message['message']['text']) && $message['message']['text'] === '🔒 Добавить ссылку') {
                 $this->menuButtonAddLink();
             } elseif (isset($message['message']['text']) && $message['message']['text'] === '📓 Мои ссылки') {
                 if (!$this->user->isUserHasSubscribe()) {
-                    MessageBuilder::abountSubscribe($message['message']['from']['id']);
+                    $this->messageBuilder->aboutSubscribe($this->user);
                     return;
                 }
                 $this->user->setAction(0);
@@ -219,7 +222,7 @@ class MessageHandleService
     private function menuButtonAddLink()
     {
         if (!$this->user->isUserHasSubscribe()) {
-            MessageBuilder::abountSubscribe($this->user->getChatId());
+            $this->messageBuilder->aboutSubscribe($this->user);
             return;
         }
         if ($this->user->getMaxAmountLinks() > $this->user->getAmountLinks()) {
@@ -238,9 +241,10 @@ class MessageHandleService
         $this->entityManager->persist($this->user);
         $this->entityManager->flush();
         if ($this->user->isUserHasSubscribe()) {
-            MessageBuilder::alreadyHasSubscription($this->user);
+            print_r('2323');
+            $this->messageBuilder->alreadyHasSubscription($this->user);
         } else {
-            MessageBuilder::abountSubscribe($this->user->getChatId());
+            $this->messageBuilder->aboutSubscribe($this->user);
         }
     }
 }

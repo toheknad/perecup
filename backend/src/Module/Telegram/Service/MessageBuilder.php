@@ -7,9 +7,16 @@ use Doctrine\Common\Collections\Collection;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\Keyboard;
 use Longman\TelegramBot\Request;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MessageBuilder
 {
+
+    public function __construct(
+        protected UrlGeneratorInterface $router
+    )
+    {
+    }
 
     public static function sendWelcomeMessage(int $chatId)
     {
@@ -22,9 +29,9 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
-            'reply_markup' =>  self::getKeyboardNotAuth(),
+            'reply_markup' => self::getKeyboardNotAuth(),
         ]);
     }
 
@@ -52,9 +59,9 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
-            'reply_markup' =>  self::getKeyboardAuth(),
+            'reply_markup' => self::getKeyboardAuth(),
         ]);
     }
 
@@ -81,9 +88,9 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
-            'reply_markup' =>  $keyboards,
+            'reply_markup' => $keyboards,
         ]);
     }
 
@@ -116,10 +123,9 @@ class MessageBuilder
 //        $keyboards->setResizeKeyboard(true);
 
 
-
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
 //            'reply_markup' =>  $keyboards,
         ]);
@@ -154,9 +160,9 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
-            'reply_markup' =>  $keyboards,
+            'reply_markup' => $keyboards,
         ]);
     }
 
@@ -169,21 +175,21 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
         ]);
     }
 
     public static function sendMatchMessage(
-        int $chatId,
-        string $name,
-        int $price,
-        string $description,
-        string $url,
-        string $baseUrl,
+        int     $chatId,
+        string  $name,
+        int     $price,
+        string  $description,
+        string  $url,
+        string  $baseUrl,
         ?string $filterName,
-        string $city,
-        string $image,
+        string  $city,
+        string  $image,
     )
     {
 //        Request::sendPhoto([
@@ -191,7 +197,7 @@ class MessageBuilder
 //            'photo'   => $image,
 //        ]);
         $priceFormated = number_format($price, 0, '.', ' ');
-        $url = 'https://www.avito.ru'.$url;
+        $url = 'https://www.avito.ru' . $url;
         $text = [];
         $text[] = "<b>🚨Новое объявление🚨</b>";
         $text[] = "";
@@ -202,7 +208,7 @@ class MessageBuilder
         if ($filterName) {
             $text[] = "📁<b>Имя фильтра</b>: {$filterName}";
         }
-        $text[] = '<a href="'.$image.'">Фото</a>';
+        $text[] = '<a href="' . $image . '">Фото</a>';
         $text = implode(PHP_EOL, $text);
 
         $ad = [];
@@ -224,7 +230,7 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
             'reply_markup' => $keyboards,
         ]);
@@ -242,7 +248,7 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
         ]);
     }
@@ -256,7 +262,7 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
         ]);
     }
@@ -270,10 +276,11 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
         ]);
     }
+
     public static function sendMessageError(int $chatId)
     {
         $text = [];
@@ -283,7 +290,7 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
         ]);
     }
@@ -291,7 +298,7 @@ class MessageBuilder
     public static function getKeyboardAuth()
     {
         return (new \Longman\TelegramBot\Entities\Keyboard(
-            ["🔒 Добавить ссылку" , "📓 Мои ссылки"],
+            ["🔒 Добавить ссылку", "📓 Мои ссылки"],
             ["💸 Подписка"],
         ))->setResizeKeyboard(true);
     }
@@ -357,48 +364,63 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
         ]);
     }
 
-    public static function abountSubscribe(int $chatId)
+    public function aboutSubscribe(TelegramUser $user)
     {
         $text = [];
         $text[] = "<b>⌛️В данный момент у вас нет подписки⌛️</b>";
         $text[] = "";
         $text[] = "<b>Какие виды подписки есть?</b>";
-        $text[] = "🔥 Подписка на 1 месяц - <b>350 рублей</b>";
-        $text[] = "🔥 Подписка на 3 месяца - <b>900 рублей</b>";
-        $text[] = "Вам будет доступно 5 ссылок для отслеживания новых машин";
+        $text[] = "🔥 Подписка на 1 неделю - <b>390 рублей</b>";
+        $text[] = "🔥 Подписка на 2 недели - <b>590 рублей</b>";
+        $text[] = "🔥 Подписка на 1 месяц - <b>890 рублей</b>";
+        $text[] = "Вам будет доступно <b>5 ссылок</b> для отслеживания новых машин";
         $text = implode(PHP_EOL, $text);
 
+        $oneWeek = [];
+        $oneWeek['text'] = 'Купить 1 неделю';
+        $oneWeek['url'] = $_ENV['BASE_URL'] . $this->router->generate('payment_create', [
+                'userId' => $user->getId(),
+                'subscriptionType' => 2
+            ]);
+
+        $twoWeek = [];
+        $twoWeek['text'] = 'Купить 2 недели';
+        $twoWeek['url'] = $_ENV['BASE_URL'] . $this->router->generate('payment_create', [
+                'userId' => $user->getId(),
+                'subscriptionType' => 3
+            ]);
 
         $oneMonth = [];
-        $oneMonth['text'] = 'Оформить на 1 месяц';
-        $oneMonth['url'] = 'https://vk.com';
+        $oneMonth['text'] = 'Купить 1 месяц';
+        $oneMonth['url'] = $_ENV['BASE_URL'] . $this->router->generate('payment_create', [
+                'userId' => $user->getId(),
+                'subscriptionType' => 4
+            ]);
 
-        $twoMonth = [];
-        $twoMonth['text'] = 'Оформить на 3 месяца';
-        $twoMonth['url'] = 'https://vk.com';
 
         $keyboards = new InlineKeyboard(
             [
-                $oneMonth,
-                $twoMonth
+                $oneWeek,
+                $twoWeek,
+                $oneMonth
             ],
         );
 
 
         Request::sendMessage([
-            'chat_id' => $chatId,
-            'text'    => $text,
+            'chat_id' => $user->getChatId(),
+            'text' => $text,
             'parse_mode' => 'HTML',
-            'reply_markup' =>  $keyboards
+            'reply_markup' => $keyboards
         ]);
     }
 
-    public static function alreadyHasSubscription(TelegramUser $user)
+    public function alreadyHasSubscription(TelegramUser $user)
     {
         $text = [];
         $keyboards = [];
@@ -409,8 +431,8 @@ class MessageBuilder
             $text[] = "<b>⌛️У вас стандартная подписка⌛️</b>";
         }
         $text[] = '';
-        $interval = (new \DateTimeImmutable())->diff($user->getSubscribe()->getActivatedTo());
-        $amountDays =  $interval->format('%a');
+        $interval = (new \DateTimeImmutable())->diff($user->getSubscribe()->last()->getActivatedTo());
+        $amountDays = $interval->format('%a');
         if ((int)$amountDays === 0) {
             $text[] = "Сегодня последний день подписки";
         } else {
@@ -420,25 +442,47 @@ class MessageBuilder
         if ((int)$amountDays === 0 || $user->hasUserTrial()) {
             $text[] = '';
             $text[] = "<b>Хотите продлить подписку?</b>";
-            $text[] = "🔥 Подписка на 1 месяц - <b>350 рублей</b>";
-            $text[] = "Вам будет доступно 5 ссылок для отслеживания новых машин";
+            $text[] = "🔥 Подписка на 1 неделю - <b>390 рублей</b>";
+            $text[] = "🔥 Подписка на 2 недели - <b>590 рублей</b>";
+            $text[] = "🔥 Подписка на 1 месяц - <b>890 рублей</b>";
+            $text[] = "Вам будет доступно <b>5 ссылок</b> для отслеживания новых машин";
+
+            $oneWeek = [];
+            $oneWeek['text'] = 'Купить 1 неделю';
+            $oneWeek['url'] = $_ENV['BASE_URL'] . $this->router->generate('payment_create', [
+                    'userId' => $user->getId(),
+                    'subscriptionType' => 2
+                ]);
+
+            $twoWeek = [];
+            $twoWeek['text'] = 'Купить 2 недели';
+            $twoWeek['url'] = $_ENV['BASE_URL'] . $this->router->generate('payment_create', [
+                    'userId' => $user->getId(),
+                    'subscriptionType' => 3
+                ]);
 
             $oneMonth = [];
-            $oneMonth['text'] = 'Оформить на 1 месяц';
-            $oneMonth['url'] = 'https://vk.com';
+            $oneMonth['text'] = 'Купить 1 месяц';
+            $oneMonth['url'] = $_ENV['BASE_URL'] . $this->router->generate('payment_create', [
+                    'userId' => $user->getId(),
+                    'subscriptionType' => 4
+                ]);
 
 
             $keyboards = new InlineKeyboard(
                 [
+                    $oneWeek,
+                    $twoWeek,
                     $oneMonth
                 ],
             );
         }
+
         $text = implode(PHP_EOL, $text);
 
         $response = [
             'chat_id' => $user->getChatId(),
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
         ];
 
@@ -471,9 +515,9 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
-            'reply_markup' =>  $keyboards,
+            'reply_markup' => $keyboards,
         ]);
     }
 
@@ -501,9 +545,45 @@ class MessageBuilder
 
         Request::sendMessage([
             'chat_id' => $chatId,
-            'text'    => $text,
+            'text' => $text,
             'parse_mode' => 'HTML',
             'reply_markup' => $keyboards
+        ]);
+    }
+
+    public static function subscriptionActivated(TelegramUser $telegramUser, int $subscriptionType)
+    {
+        $text = [];
+        $text[] = "👋 <b>Отлично!</b>";
+        $text[] = "";
+        if ($subscriptionType == 2) {
+            $text[] = "Вы купили подписку на 1 неделю";
+        } elseif ($subscriptionType == 3) {
+            $text[] = "Вы купили подписку на 2 недели";
+        } elseif ($subscriptionType == 4) {
+            $text[] = "Вы купили подписку на 1 месяц";
+        }
+        $text[] = "Нажмите кнопку ниже, если хотите добавить новую ссылку";
+
+        $text = implode(PHP_EOL, $text);
+
+        $startTrialButton = [];
+        $startTrialButton['text'] = '🔒 Добавить ссылку';
+        $startTrialButton['callback_data'] = json_encode(['type' => 'menu', 'action' => 'add-link']);
+
+
+        $keyboards = new InlineKeyboard(
+            [
+                $startTrialButton,
+            ],
+        );
+
+
+        Request::sendMessage([
+            'chat_id' => $telegramUser->getChatId(),
+            'text'    => $text,
+            'parse_mode' => 'HTML',
+            'reply_markup' =>  $keyboards,
         ]);
     }
 

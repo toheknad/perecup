@@ -30,12 +30,13 @@ class TelegramUser
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ParseUrl::class, cascade: ["remove"])]
     private Collection $parseUrls;
 
-    #[ORM\OneToOne(targetEntity: Subscribe::class, cascade: ["persist", "remove"])]
-    private ?Subscribe $subscribe = null;
+    #[ORM\OneToMany(mappedBy: 'telegramUser', targetEntity: Subscribe::class, cascade: ["all"])]
+    private Collection $subscribe;
 
     public function __construct()
     {
         $this->parseUrls = new ArrayCollection();
+        $this->subscribe = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -103,27 +104,23 @@ class TelegramUser
         return $this->action;
     }
 
+    public function setSubscribe(Subscribe $subscribe): TelegramUser
+    {
+        $this->subscribe[] = $subscribe;
+        return $this;
+    }
+
     /**
-     * @return Subscribe
+     * @return Collection|ParseUrl[]
      */
-    public function getSubscribe(): ?Subscribe
+    public function getSubscribe(): Collection
     {
         return $this->subscribe;
     }
 
-    /**
-     * @param Subscribe $subscribe
-     * @return TelegramUser
-     */
-    public function setSubscribe(Subscribe $subscribe): TelegramUser
-    {
-        $this->subscribe = $subscribe;
-        return $this;
-    }
-
     #[Pure] public function isUserHasSubscribe(): bool
     {
-        if ($this->getSubscribe() && !$this->isSubscriptionEnded()) {
+        if ($this->getSubscribe()->last() && !$this->isSubscriptionEnded()) {
             return true;
         }
         return false;
@@ -131,13 +128,11 @@ class TelegramUser
 
     public function getMaxAmountLinks(): int
     {
-        if ($this->getSubscribe()?->getType() === Subscribe::SUBSCRIBE_TYPE_TRIAL) {
+        if ($this->getSubscribe()->last()->getType() === Subscribe::SUBSCRIBE_TYPE_TRIAL) {
             return 1;
         }
 
-        if ($this->getSubscribe()?->getType() === Subscribe::SUBSCRIBE_TYPE_STANDART) {
-            return 5;
-        }
+        return 5;
     }
 
     public function getAmountLinks(): int
@@ -147,16 +142,16 @@ class TelegramUser
 
     public function hasUserTrial(): bool
     {
-        return $this->getSubscribe()->getType() === Subscribe::SUBSCRIBE_TYPE_TRIAL;
+        return $this->getSubscribe()->last()->getType() === Subscribe::SUBSCRIBE_TYPE_TRIAL;
     }
 
     public function hasUserStandart(): bool
     {
-        return $this->getSubscribe()->getType() === Subscribe::SUBSCRIBE_TYPE_STANDART;
+        return $this->getSubscribe()->last()->getType() !== Subscribe::SUBSCRIBE_TYPE_TRIAL;
     }
 
     public function isSubscriptionEnded(): bool
     {
-        return (new \DateTimeImmutable()) > $this->getSubscribe()->getActivatedTo();
+        return (new \DateTimeImmutable()) > $this->getSubscribe()->last()->getActivatedTo();
     }
 }

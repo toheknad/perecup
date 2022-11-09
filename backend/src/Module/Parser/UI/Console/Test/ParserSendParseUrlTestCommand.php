@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\MessageBusInterface;
+use YooKassa\Client;
 
 #[AsCommand(
     name: 'parser:send-parse-url-test',
@@ -42,28 +43,24 @@ class ParserSendParseUrlTestCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $ts = microtime(true);
-        $this->logger->info('Запущено!');
-        $io = new SymfonyStyle($input, $output);
 
-        $lstParseUrl = $this->parseUrlRepository->getActiveNow();
-        $dt = (new DateTime())->format('Y-m-d H:i:s');
-        echo $dt . " - START". PHP_EOL;
-        foreach ($lstParseUrl as $item) {
-            $proxy = $this->proxyRepository->getNextProxy();
-            echo $dt . " - LINK ADD". PHP_EOL;
-            if ($this->urlCheckedRepository->count(['parseUrl' => $item]) === 0) {
-                $parseUrlMessage = ParseUrlMessage::createFromEntity($item, $proxy->getProxy(), true);
-            } else {
-                $parseUrlMessage = ParseUrlMessage::createFromEntity($item, $proxy->getProxy(), false);
-            }
-            $en = $this->messageBus->dispatch($parseUrlMessage);
-            $this->logger->debug('Отправлено в очередь!', [$en]);
-
-            $this->logger->info('Успешно заврешено, [время выполнения]', [microtime(true) - $ts]);
-        }
-
-
-        return Command::SUCCESS;
+        $client = new Client();
+        $client->setAuth('954991', 'test_fJCV-HeSHVsRH5wmSHTKKLVaUs8mOlh4DGA7YdJ6VY8');
+        $payment = $client->createPayment(
+            array(
+                'amount' => array(
+                    'value' => 350.0,
+                    'currency' => 'RUB',
+                ),
+                'confirmation' => array(
+                    'type' => 'redirect',
+                    'return_url' => 'https://www.example.com/return_url',
+                ),
+                'capture' => true,
+                'description' => 'Оплата подписки на 1 месяц',
+            ),
+            uniqid('', true)
+        );
+        print_r($payment->toArray());
     }
 }

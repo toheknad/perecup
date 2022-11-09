@@ -30,14 +30,16 @@ class Subscribe
     #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $activatedTo;
 
-    #[ORM\OneToOne(targetEntity: TelegramUser::class)]
+    #[ORM\ManyToOne(targetEntity: TelegramUser::class, inversedBy: 'subscribe')]
     private TelegramUser $telegramUser;
 
     #[ORM\Column(type: 'integer')]
     private int $type;
 
     public const SUBSCRIBE_TYPE_TRIAL = 1;
-    public const SUBSCRIBE_TYPE_STANDART = 2;
+    public const SUBSCRIBE_TYPE_ONE_WEEK = 2;
+    public const SUBSCRIBE_TYPE_TWO_WEEK = 3;
+    public const SUBSCRIBE_TYPE_MONTH = 4;
 
     public function __construct()
     {
@@ -180,6 +182,39 @@ class Subscribe
     public function getActivatedTo(): \DateTimeImmutable
     {
         return $this->activatedTo;
+    }
+
+    public static function makeOneWeekSubscription(TelegramUser $telegramUser): Subscribe
+    {
+        $subscription = new self();
+        $subscription->setTelegramUser($telegramUser);
+        $subscription->setType(self::SUBSCRIBE_TYPE_ONE_WEEK);
+        $subscription->setActivatedFrom(new \DateTimeImmutable());
+        $subscription->setActivatedTo((new \DateTimeImmutable())->modify('+7 days'));
+
+        return $subscription;
+    }
+
+    public static function makeTwoWeekSubscription(TelegramUser $telegramUser): Subscribe
+    {
+        $subscription = new self();
+        $subscription->setTelegramUser($telegramUser);
+        $subscription->setType(self::SUBSCRIBE_TYPE_TWO_WEEK);
+        $subscription->setActivatedFrom(new \DateTimeImmutable());
+        $subscription->setActivatedTo((new \DateTimeImmutable())->modify('+14 days'));
+
+        return $subscription;
+    }
+
+    public static function makeOneMonthSubscription(TelegramUser $telegramUser): Subscribe
+    {
+        $subscription = new self();
+        $subscription->setTelegramUser($telegramUser);
+        $subscription->setType(self::SUBSCRIBE_TYPE_MONTH);
+        $subscription->setActivatedFrom(new \DateTimeImmutable());
+        $subscription->setActivatedTo((new \DateTimeImmutable())->modify('+1 month'));
+
+        return $subscription;
     }
 
 }

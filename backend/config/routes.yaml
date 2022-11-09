@@ -4,6 +4,9 @@ user:
 telegram:
     resource: ../src/Module/Telegram/UI/Http/Controller/
     type: annotation
+payment:
+    resource: ../src/Module/Payment/UI/Http/Controller/
+    type: annotation
 
 kernel:
     resource: ../src/Kernel.php

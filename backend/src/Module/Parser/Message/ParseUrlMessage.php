@@ -15,14 +15,14 @@ class ParseUrlMessage
         public string  $source,              // Источник/сайт для парсинга
         public string  $url,                 // URL адрес страницы для парсинга
         public int  $userId,                 // URL адрес страницы для парсинга
-        public string  $proxy,                  // URL адрес страницы для парсинга
+        public array  $proxy,                  // URL адрес страницы для парсинга
         public bool  $isFirstCheck                  // URL адрес страницы для парсинга
     )
     {
     }
 
     #[Pure]
-    public static function createFromEntity(ParseUrl $item, string $proxy, bool $isFirstCheck): ParseUrlMessage
+    public static function createFromEntity(ParseUrl $item, array $proxy, bool $isFirstCheck): ParseUrlMessage
     {
         return new self(
             $item->getSource(),
