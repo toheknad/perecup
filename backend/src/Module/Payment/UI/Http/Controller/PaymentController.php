@@ -43,7 +43,7 @@ class PaymentController extends AbstractController
             $user = $this->telegramUserRepository->find($userId);
             $client = new Client();
             $paymentData = $this->definePriceAndDescription($subscriptionType);
-            $client->setAuth('954991', 'test_fJCV-HeSHVsRH5wmSHTKKLVaUs8mOlh4DGA7YdJ6VY8');
+            $client->setAuth( $_ENV['YOOKASSA_SHOP'],  $_ENV['YOOKASSA_PASSWORD']);
             $payment = $client->createPayment(
                 array(
                     'amount' => array(
