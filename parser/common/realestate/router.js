@@ -28,26 +28,37 @@ amqp.connect(config.rabbitMQUrl, (err, conn) => {
             console.log('TEST')
         }
         ch.assertQueue(config.urlQueueParse, { durable: true });
-        ch.prefetch(1);
+        ch.prefetch(7);
         ch.consume(config.urlQueueParse, async (msg) => {
             let task = JSON.parse(msg.content.toString());
             // console.log(task);
             let result = {};
+            const browser = await puppeteer.launch({
+                headless: true,
+                args: [
+                    "--disable-gpu",
+                    "--disable-dev-shm-usage",
+                    "--disable-setuid-sandbox",
+                    "--no-sandbox",
+                    "--proxy-server=http://"+task.proxy.data.ip,
+                ]
+            });
+
             if (task.source === 'avito') {
                 for (let i = 0; i < task.links.length; i++) {
 
                     let fullUrl = task.links[i].url;
 
 
-                    result = await cars(fullUrl, task.proxy.data, task.links[i].sleepSeconds);
+                    result = await cars(fullUrl, task.proxy.data, task.links[i].sleepSeconds, browser);
 
                     let isFirstCheck;
                     if (task.links[i].isFirstCheck === true) {
                         isFirstCheck = true;
-                        console.log('TRUE');
+                        // console.log('TRUE');
                     } else {
                         isFirstCheck = false;
-                        console.log('FALSE');
+                        // console.log('FALSE');
                     }
                     for (let c = 0; c < result.length; c++) {
                         // let e = {test:'123123'};
@@ -63,6 +74,11 @@ amqp.connect(config.rabbitMQUrl, (err, conn) => {
                     }
                 }
             }
+
+
+            await browser.close();
+
+
             let redisClient;
 
             let proxy = task.proxy
@@ -79,6 +95,7 @@ amqp.connect(config.rabbitMQUrl, (err, conn) => {
             await redisClient.on("error", (error) => console.error(`Error : ${error}`));
             await redisClient.connect();
             await redisClient.lPush('hold_proxies', JSON.stringify(proxy));
+            console.log('ADDING IN REDIS');
 
             // нужно создать очередь вручную в браузере, чтобы все было ок
             ch.ack(msg);

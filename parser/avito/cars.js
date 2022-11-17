@@ -9,7 +9,7 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 puppeteer.use(StealthPlugin())
 
 
-module.exports = async (url, proxy, sleepSeconds) => {
+module.exports = async (url, proxy, sleepSeconds, browser) => {
 
     // Return anonymized version of original URL - looks like http://127.0.0.1:16383
     function sleep(ms) {
@@ -24,20 +24,20 @@ module.exports = async (url, proxy, sleepSeconds) => {
     // const baseUrl = 'https://bot.sannysoft.com';;
 
 
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: [
-            "--disable-gpu",
-            "--disable-dev-shm-usage",
-            "--disable-setuid-sandbox",
-            "--no-sandbox",
-            // "--user-agent=" + userAgent + "",
-            // "--proxy-server=socks4://176.123.56.58:3629",
-            // "--proxy-server="+httpProxy,
-            "--proxy-server=http://"+proxy.ip,
-            // "--proxy-server=http://83.217.7.249:11223",
-        ]
-    });
+    // const browser = await puppeteer.launch({
+    //     headless: true,
+    //     args: [
+    //         "--disable-gpu",
+    //         "--disable-dev-shm-usage",
+    //         "--disable-setuid-sandbox",
+    //         "--no-sandbox",
+    //         // "--user-agent=" + userAgent + "",
+    //         // "--proxy-server=socks4://176.123.56.58:3629",
+    //         // "--proxy-server="+httpProxy,
+    //         "--proxy-server=http://"+proxy.ip,
+    //         // "--proxy-server=http://83.217.7.249:11223",
+    //     ]
+    // });
 
     const page = await browser.newPage();
     //
@@ -71,7 +71,8 @@ module.exports = async (url, proxy, sleepSeconds) => {
         // await page.waitForSelector('span[data-marker="pagination-button/next"]');
     } catch(e) {
         console.log(e);
-        await browser.close();
+        // await browser.close();
+        await page.close()
         return [];
     }
     // слип для проверки удаления объявлений из блока дороже чем вы указали
@@ -182,7 +183,10 @@ module.exports = async (url, proxy, sleepSeconds) => {
         console.log('NO')
         // await page.screenshot({path: 'before.png',  fullPage: true });
     }
-    await browser.close();
+
+    // await browser.close();
+    await page.close()
+
     // console.log('DONE!');
     return filtered;
 };
