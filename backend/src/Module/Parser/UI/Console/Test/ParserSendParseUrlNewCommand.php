@@ -77,9 +77,9 @@ class ParserSendParseUrlNewCommand extends Command
 //                    $maxAmountUrlForProxy = 0;
 //                }
                 if ($this->urlCheckedRepository->count(['parseUrl' => $item]) === 0) {
-                    $parseUrlMessage = ParseUrlMessage::createFromEntity($item, $proxy->getArray(), true);
+                    $parseUrlMessage = ParseUrlMessage::createFromEntity($item,  true);
                 } else {
-                    $parseUrlMessage = ParseUrlMessage::createFromEntity($item, $proxy->getArray(), false);
+                    $parseUrlMessage = ParseUrlMessage::createFromEntity($item,false);
                 }
                 $this->messageBus->dispatch($parseUrlMessage);
                 $maxAmountUrlForProxy++;

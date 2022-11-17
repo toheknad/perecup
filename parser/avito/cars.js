@@ -9,7 +9,7 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 puppeteer.use(StealthPlugin())
 
 
-module.exports = async (url, proxy) => {
+module.exports = async (url, proxy, sleepSeconds) => {
 
     // Return anonymized version of original URL - looks like http://127.0.0.1:16383
     function sleep(ms) {
@@ -17,14 +17,13 @@ module.exports = async (url, proxy) => {
     }
 
     const baseUrl = url;
-    // const baseUrl = 'https://avito.ru/pyatigorsk/avtomobili/s_probegom-ASgBAgICAUSGFMjmAQ?f=ASgBAgECA0TyCrCKAYYUyOYB9sQNvrA6AUXGmgwXeyJmcm9tIjowLCJ0byI6NTAwMDAwMH0&moreExpensive=0&radius=0&s=104&presentationType=serp&localPriority=1';
+    // const baseUrl = 'https://www.avito.ru/stavropol/avtomobili/hyundai/miniven/avtomat-ASgBAQICAUTgtg2imzECQOa2DRTGtyjwtg0U7rco?cd=1&f=ASgBAQECA0TyCrCKAYYUyOYB4LYNopsxAkDmtg0Uxrco8LYNFO63KAFFxpoMGHsiZnJvbSI6MCwidG8iOjEwMDAwMDAwfQ&moreExpensive=1&radius=300&s=104';
+    // const baseUrl = 'https://m.avito.ru/stavropol/avtomobili/s_probegom/hyundai/accent/avtomat-ASgBAQICA0SGFMjmAeC2DaKbMeK2DaSbMQFA8LYNFO63KA?cd=1&f=ASgBAQECBETyCrCKAYYUyOYB4LYNopsx4rYNpJsxAUDwtg0U7rcoAkX4AhZ7ImZyb20iOjg5OCwidG8iOm51bGx9xpoMFnsiZnJvbSI6MCwidG8iOjIwMDAwMH0&radius=300';
     // const baseUrl = 'https://2ip.ru/';
     // const baseUrl = 'https://arh.antoinevastel.com/bots/areyouheadless';
     // const baseUrl = 'https://bot.sannysoft.com';;
 
 
-    const userAgent = new UserAgent({ platform: 'Win32' });
-    let httpProxy = 'http://'+proxy;
     const browser = await puppeteer.launch({
         headless: true,
         args: [
@@ -35,39 +34,60 @@ module.exports = async (url, proxy) => {
             // "--user-agent=" + userAgent + "",
             // "--proxy-server=socks4://176.123.56.58:3629",
             // "--proxy-server="+httpProxy,
-            // "--proxy-server=http://188.143.169.29:30153",
+            "--proxy-server=http://"+proxy.ip,
+            // "--proxy-server=http://83.217.7.249:11223",
         ]
     });
 
-    const username = 'iparchitect_17211_21_10_22';
-    const password = 'f6i3rABhAFb6KRTdn8';
     const page = await browser.newPage();
+    //
+    await page.authenticate({
+        username: proxy.login,
+        password: proxy.password,
+        // username: 'w2Sa86Rcpo',
+        // password: 'sXT5wUtBWx',
+    });
 
-    // await page.authenticate({
-    //     username: username,
-    //     password: password,
-    // });
-
-    console.log(""+userAgent);
-    console.log(proxy);
-    // console.log(baseUrl);
+    console.log(proxy.ip);
     await page.setRequestInterception(true);
+    var i = 0;
     page.on('request', (request) => {
-        if (['image', 'font', 'stylesheet', 'script'].indexOf(request.resourceType()) !== -1) {
+        // if (['image', 'font', 'stylesheet', 'script', 'gif', 'png', 'svg+xml', 'webp', 'javascript', 'xhr'].indexOf(request.resourceType()) !== -1) {
+        //     request.abort();
+        // } else {
+        //     request.continue();
+        // }
+        if (i > 1) {
             request.abort();
         } else {
             request.continue();
         }
+        i++;
     });
-    await page.goto(baseUrl);
+    try {
+        await page.goto(baseUrl);
+        // console.log('YES');
+        // return [];
+        // await page.waitForSelector('span[data-marker="pagination-button/next"]');
+    } catch(e) {
+        console.log(e);
+        await browser.close();
+        return [];
+    }
     // слип для проверки удаления объявлений из блока дороже чем вы указали
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < sleepSeconds; i++) {
         console.log(`Waiting ${i} seconds...`);
         await sleep(i * 1000);
     }
 
+    console.log(baseUrl);
     // await page.screenshot({path: 'before.png',  fullPage: true });
     // удаление дороже чем у вас
+    // const sfasf = await page.content();
+    // fs.writeFile('tset223.html', sfasf, function (err) {
+    //     if (err) return console.log(err);
+    //     console.log('Hello World > helloworld.txt');
+    // });
 
     await page.evaluate(`
       let extra = document.querySelectorAll('div[class*="items-extra"]');
@@ -113,7 +133,6 @@ module.exports = async (url, proxy) => {
     `);
 
     // await page.screenshot({path: 'after.png',  fullPage: true });
-    // await page.waitForSelector('span[data-marker="pagination-button/next"]');
     //количество страниц≠
 
     let data = await page.$$eval('div[data-marker="catalog-serp"] div[itemtype="http://schema.org/Product"]', elements => {
@@ -161,8 +180,8 @@ module.exports = async (url, proxy) => {
         console.log('YES');
     } else {
         console.log('NO')
+        // await page.screenshot({path: 'before.png',  fullPage: true });
     }
-
     await browser.close();
     // console.log('DONE!');
     return filtered;

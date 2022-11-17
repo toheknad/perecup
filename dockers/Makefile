@@ -36,6 +36,9 @@ nodejs:
 telegram-get-messages:
 	docker-compose exec php-fpm bin/console telegram:get-messages
 
+node-parser:
+	docker-compose exec parser-nodejs node common/realestate/router
+
 
 
 

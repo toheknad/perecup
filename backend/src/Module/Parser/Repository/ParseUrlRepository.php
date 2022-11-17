@@ -66,4 +66,14 @@ class ParseUrlRepository extends ServiceEntityRepository
         return $res;
     }
 
+    public function getUrlsForProxy(int $lastUrlId, int $amount)
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->setFirstResult($lastUrlId)
+            ->setMaxResults($amount)
+            ->orderBy('p.id', 'ASC');
+
+        return $qb->getQuery()->execute();
+    }
+
 }

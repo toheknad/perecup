@@ -11,25 +11,32 @@ use JetBrains\PhpStorm\Pure;
 class ParseUrlMessage
 {
 
+//    public function __construct(
+//        public string  $source,              // Источник/сайт для парсинга
+//        public string  $url,                 // URL адрес страницы для парсинга
+//        public int  $userId,                 // URL адрес страницы для парсинга
+//        public bool  $isFirstCheck                  // URL адрес страницы для парсинга
+//    )
+//    {
+//    }
+//
+//    #[Pure]
+//    public static function createFromEntity(ParseUrl $item, bool $isFirstCheck): ParseUrlMessage
+//    {
+//        return new self(
+//            $item->getSource(),
+//            $item->getUrl(),
+//            $item->getUser()->getId(),
+//            $isFirstCheck
+//        );
+//    }
+
     public function __construct(
-        public string  $source,              // Источник/сайт для парсинга
-        public string  $url,                 // URL адрес страницы для парсинга
-        public int  $userId,                 // URL адрес страницы для парсинга
-        public array  $proxy,                  // URL адрес страницы для парсинга
-        public bool  $isFirstCheck                  // URL адрес страницы для парсинга
+        public string $source,
+        public array $links,
+        public array $proxy,
     )
     {
     }
 
-    #[Pure]
-    public static function createFromEntity(ParseUrl $item, array $proxy, bool $isFirstCheck): ParseUrlMessage
-    {
-        return new self(
-            $item->getSource(),
-            $item->getUrl(),
-            $item->getUser()->getId(),
-            $proxy,
-            $isFirstCheck
-        );
-    }
 }

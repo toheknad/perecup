@@ -155,6 +155,9 @@
     "phpstan/phpdoc-parser": {
         "version": "1.4.1"
     },
+    "predis/predis": {
+        "version": "v2.0.3"
+    },
     "psr/cache": {
         "version": "3.0.0"
     },

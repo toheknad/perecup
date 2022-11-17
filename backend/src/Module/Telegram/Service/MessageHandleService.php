@@ -80,6 +80,8 @@ class MessageHandleService
                 MessageBuilder::sendAllLinksUser($message['message']['from']['id'], $this->user->getParseUrls());
             } elseif (isset($message['message']['text']) && $message['message']['text'] === '💸 Подписка') {
                 $this->menuSubscription();
+            } elseif (isset($message['message']['text']) && $message['message']['text'] === 'ℹ️ Помощь') {
+                MessageBuilder::help($message['message']['from']['id']);
             } elseif (isset($message['callback_query'])) { // нажатие на кнопку
                 $this->callbackHandler($message);
             } else {
@@ -225,7 +227,7 @@ class MessageHandleService
             $this->messageBuilder->aboutSubscribe($this->user);
             return;
         }
-        if ($this->user->getMaxAmountLinks() > $this->user->getAmountLinks()) {
+        if (($this->user->getMaxAmountLinks() > $this->user->getAmountLinks()) || $this->user->getSubscribe()->last()->getType() == 10) {
             $this->user->setAction(ActionList::ADDING_LINK);
             $this->entityManager->persist($this->user);
             $this->entityManager->flush();

@@ -299,7 +299,7 @@ class MessageBuilder
     {
         return (new \Longman\TelegramBot\Entities\Keyboard(
             ["🔒 Добавить ссылку", "📓 Мои ссылки"],
-            ["💸 Подписка"],
+            ["💸 Подписка", "ℹ️ Помощь"],
         ))->setResizeKeyboard(true);
     }
 
@@ -587,5 +587,19 @@ class MessageBuilder
         ]);
     }
 
+    public static function help(int $chatId)
+    {
+        $text = [];
+        $text[] = "<b>👨‍💻 У вас какие-то проблемы?</b>";
+        $text[] = "Напишите ваш вопрос и мы обязательно вам ответим";
+        $text[] = "Техподдержка: @toheknad";
+        $text = implode(PHP_EOL, $text);
+        Request::sendMessage([
+            'chat_id' => $chatId,
+            'text' => $text,
+            'parse_mode' => 'HTML',
+        ]);
+
+    }
 
 }
