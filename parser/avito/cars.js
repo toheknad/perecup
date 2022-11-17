@@ -72,6 +72,7 @@ module.exports = async (url, proxy, sleepSeconds, browser) => {
     } catch(e) {
         console.log(e);
         // await browser.close();
+        // await page.screenshot({path: '11before.png',  fullPage: true });
         await page.close()
         return [];
     }
@@ -183,10 +184,9 @@ module.exports = async (url, proxy, sleepSeconds, browser) => {
         console.log('NO')
         // await page.screenshot({path: 'before.png',  fullPage: true });
     }
-
+    // await page.screenshot({path: 'before.png',  fullPage: true });
     // await browser.close();
     await page.close()
-
     // console.log('DONE!');
     return filtered;
 };
