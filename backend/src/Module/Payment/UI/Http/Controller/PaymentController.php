@@ -128,7 +128,7 @@ class PaymentController extends AbstractController
         switch ($subscriptionType) {
             case Subscribe::SUBSCRIBE_TYPE_ONE_WEEK:
                 return [
-                    'price' => 1,
+                    'price' => 390.0,
                     'description' => "Оплата подписки на 1 неделю",
                 ];
             case Subscribe::SUBSCRIBE_TYPE_TWO_WEEK:
