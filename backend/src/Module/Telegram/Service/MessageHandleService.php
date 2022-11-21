@@ -141,7 +141,10 @@ class MessageHandleService
                 }
 
                 // если ссылка мобильная
-                $url = str_replace('m.avito', 'avito', $url);
+                if (!mb_stripos($url, 'm.avito')) {
+                    $url = str_replace('avito', 'm.avito', $url);
+                }
+                $url = str_replace('//www.', '//', $url);
                 $parseUrl = new ParseUrl();
                 $parseUrl->setUrl($url);
                 $parseUrl->setPeriod(1);
