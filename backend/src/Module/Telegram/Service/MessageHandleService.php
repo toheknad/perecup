@@ -164,6 +164,8 @@ class MessageHandleService
                 $this->entityManager->flush();
                 $this->entityManager->clear();
                 MessageBuilder::sendMessageAfterSavingLink($message['message']['from']['id']);
+
+                MessageBuilder::sendExampleAds($message['message']['from']['id']);
             } else {
                 $this->user->setAction(0);
                 MessageBuilder::sendMessageError($message['message']['from']['id']);
