@@ -35,12 +35,14 @@ amqp.connect(config.rabbitMQUrl, (err, conn) => {
             let result = {};
             const browser = await puppeteer.launch({
                 headless: true,
+                userDataDir: '/dev/null',
                 args: [
                     "--disable-gpu",
                     "--disable-dev-shm-usage",
                     "--disable-setuid-sandbox",
                     "--no-sandbox",
                     "--proxy-server=http://"+task.proxy.data.ip,
+
                 ]
             });
 
