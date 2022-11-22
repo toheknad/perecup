@@ -74,6 +74,7 @@ class RedisProxiesDispenserCommand extends Command
                 // если в free_proxies ничего нет, то мы идем в hold_proxies
                 $this->transerProxiesFromHoldToFree($io, $amountHoldProxies);
             }
+            sleep(1);
         }
     }
 
