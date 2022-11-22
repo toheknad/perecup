@@ -35,7 +35,7 @@ amqp.connect(config.rabbitMQUrl, (err, conn) => {
             let result = {};
             const browser = await puppeteer.launch({
                 headless: true,
-                userDataDir: '/dev/null',
+                // userDataDir: '/dev/null',
                 args: [
                     "--disable-gpu",
                     "--disable-dev-shm-usage",

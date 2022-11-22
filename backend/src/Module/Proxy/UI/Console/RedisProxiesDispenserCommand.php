@@ -73,6 +73,8 @@ class RedisProxiesDispenserCommand extends Command
             } elseif ($amountHoldProxies = $this->client->llen(self::REDIS_HOLD_PROXIES)){
                 // если в free_proxies ничего нет, то мы идем в hold_proxies
                 $this->transerProxiesFromHoldToFree($io, $amountHoldProxies);
+            } else {
+                $io->success((new \DateTimeImmutable())->format('Y-m-d H:i:s'). ' - Прокси нет в редисе ');
             }
             sleep(1);
         }
